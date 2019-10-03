@@ -104,9 +104,6 @@ export default {
   data: () => ({
     circleAnimating: false
   }),
-  created() {
-    window.anime = anime
-  },
   methods: {
     hover(el) {
       const first = el.querySelector('path:nth-child(1)')
@@ -115,10 +112,12 @@ export default {
       animate(first, second)
     },
     mouseenter() {
-      if (this.circleAnimating) return false
-
       const c1 = this.$refs.circle1
       const c2 = this.$refs.circle2
+
+      if (this.circleAnimating) {
+        anime.remove([c1, c2])
+      }
 
       const tl = anime.timeline({
         begin: () => {
@@ -138,24 +137,23 @@ export default {
       tl.add({
         targets: c1,
         duration: 350,
-        // translateX: ['0px', '10px'],
-        // scaleY: [1, 0.3],
         translateX: '10px',
         scaleY: 0.3,
         easing: 'easeInCirc'
       }).add({
         targets: c2,
         duration: 400,
-        // scale: [0, 1],
         scale: 1,
         easing: 'easeOutCirc'
       })
     },
     mouseout() {
-      if (this.circleAnimating) return false
-
       const c1 = this.$refs.circle1
       const c2 = this.$refs.circle2
+
+      if (this.circleAnimating) {
+        anime.remove([c1, c2])
+      }
 
       const tl = anime.timeline({
         begin: () => {
@@ -171,14 +169,11 @@ export default {
         duration: 300,
         translateX: '10px',
         translateY: '-10px',
-        // scale: [1, 0],
         scale: 0,
         easing: 'easeInCirc'
       }).add({
         targets: c1,
         duration: 250,
-        // translateX: ['10px', '0px'],
-        // scaleY: [0.3, 1],
         translateX: '0px',
         scaleY: 1,
         easing: 'easeOutCirc'
@@ -189,6 +184,13 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+.is-firefox
+  .circles
+    padding-top: calc(var(--unit-v))
+  .wave
+    padding-bottom: calc(var(--unit-v))
+
+
 .ui-btn
   width: 80px
   height: 80px
@@ -218,7 +220,7 @@ export default {
 
   padding-right: var(--unit-h)
   padding-bottom: calc(var(--unit-v) - 22px)
-  align-items: flex-start
+  align-items: flex-end
   justify-content: flex-end
 
 .circles

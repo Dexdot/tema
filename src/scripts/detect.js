@@ -28,3 +28,7 @@ export const isSafari = () =>
 
 export const isMACOS = () =>
   navigator.platform.toUpperCase().indexOf('MAC') >= 0
+
+export const isFirefox = () => {
+  return navigator.userAgent.toLowerCase().indexOf('firefox') > -1
+}

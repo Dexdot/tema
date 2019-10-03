@@ -23,6 +23,7 @@
 import Menu from '@/Menu'
 import Scroll from '@/Scroll'
 import transitions from '@/transitions/'
+import { isFirefox } from '@/scripts/detect'
 
 export default {
   name: 'App',
@@ -38,6 +39,10 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.mounted = true
+
+      if (isFirefox()) {
+        document.body.classList.add('is-firefox')
+      }
     })
   },
   methods: {
