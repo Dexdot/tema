@@ -1,0 +1,19 @@
+@import "responsive-mixin"
+@import "grid"
+
+// TT Norms
+=norms
+  font-family: 'TT Norms'
+  font-weight: 400
+
+// Woodland
+=wood($weight: r)
+  @if $weight == u
+    font-family: 'PP Woodland'
+    font-weight: 200
+  @if $weight == r
+    font-family: 'PP Woodland'
+    font-weight: 400
+  @if $weight == m
+    font-family: 'PP Woodland'
+    font-weight: 500

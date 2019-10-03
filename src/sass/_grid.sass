@@ -1,0 +1,42 @@
+\:root
+  // // Grid proportions
+  // --grid-width: 1792
+  // --grid-column-width: 120
+  // --grid-columns: 12
+
+  // // Grid logic
+  // --grid-gutters: calc(var(--grid-columns) - 1)
+
+  // // Grid proportion logic
+  // --column-proportion: calc(var(--grid-column-width) / var(--grid-width))
+  // --gutter-proportion: calc((1 - (var(--grid-columns) * var(--column-proportion))) / var(--grid-gutters))
+
+  // // Container Units
+  // --column-unit: calc(var(--column-proportion) * var(--container-width))
+  // --gutter-unit: calc(var(--gutter-proportion) * var(--container-width))
+  // --column-and-gutter-unit: calc(var(--column-unit) + var(--gutter-unit))
+
+  // // Container Width
+  // --container-width: calc(100vw - var(--unit-h) * 2)
+
+  --unit-v: 48px
+  --unit-h: 3.75vw
+
+  @media (max-width: 500px)
+    --unit-v: 32px
+    --unit-h: 24px
+  
+// @function columns($i)
+//   @return calc(#{$i} * var(--column-unit))
+
+// @function gutters($i)
+//   @return calc(#{$i} * var(--gutter-unit))
+
+// @function column-spans($i)
+//   @return calc(#{$i} * var(--column-and-gutter-unit) - var(--gutter-unit))
+
+// @function gutter-spans($i)
+//   @return calc(#{$i} * var(--column-and-gutter-unit) - var(--column-unit))
+
+// @function mix($columns, $gutters: $columns)
+//   @return calc((#{$columns} * var(--column-unit)) + (#{$gutters} * var(--gutter-unit)))
