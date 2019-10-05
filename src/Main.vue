@@ -64,7 +64,7 @@
     >
       <div class="circles__i" ref="circle1"></div>
       <div class="circles__i" ref="circle2"></div>
-      <div class="circles__i"></div>
+      <div class="circles__i" ref="circle3"></div>
     </button>
   </div>
 </template>
@@ -114,9 +114,10 @@ export default {
     mouseenter() {
       const c1 = this.$refs.circle1
       const c2 = this.$refs.circle2
+      const c3 = this.$refs.circle3
 
       if (this.circleAnimating) {
-        anime.remove([c1, c2])
+        anime.remove([c1, c2, c3])
       }
 
       const tl = anime.timeline({
@@ -129,7 +130,7 @@ export default {
       })
 
       anime.set(c2, {
-        translateX: '10px',
+        translateX: '4px',
         translateY: '-10px',
         scale: 0
       })
@@ -137,22 +138,33 @@ export default {
       tl.add({
         targets: c1,
         duration: 350,
-        translateX: '10px',
+        translateX: '4px',
         scaleY: 0.3,
-        easing: 'easeInCirc'
-      }).add({
-        targets: c2,
-        duration: 400,
-        scale: 1,
-        easing: 'easeOutCirc'
+        easing: 'easeInQuint'
       })
+        .add(
+          {
+            targets: c3,
+            duration: 350,
+            translateX: '-6px',
+            easing: 'easeInQuint'
+          },
+          '-=350'
+        )
+        .add({
+          targets: c2,
+          duration: 400,
+          scale: 1,
+          easing: 'easeOutQuint'
+        })
     },
     mouseout() {
       const c1 = this.$refs.circle1
       const c2 = this.$refs.circle2
+      const c3 = this.$refs.circle3
 
       if (this.circleAnimating) {
-        anime.remove([c1, c2])
+        anime.remove([c1, c2, c3])
       }
 
       const tl = anime.timeline({
@@ -167,16 +179,16 @@ export default {
       tl.add({
         targets: c2,
         duration: 300,
-        translateX: '10px',
+        translateX: '4px',
         translateY: '-10px',
         scale: 0,
-        easing: 'easeInCirc'
+        easing: 'easeInQuint'
       }).add({
-        targets: c1,
+        targets: [c1, c3],
         duration: 250,
         translateX: '0px',
         scaleY: 1,
-        easing: 'easeOutCirc'
+        easing: 'easeOutQuint'
       })
     }
   }
@@ -253,5 +265,5 @@ export default {
       height: 24px
       border: 1px solid #fff
       background: 0
-      transform: translate(10px, -10px) scale(0)
+      transform: translate(4px, -10px) scale(0)
 </style>
