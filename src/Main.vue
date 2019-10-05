@@ -38,39 +38,18 @@
       </svg>
     </router-link>
 
-    <button class="wave ui-btn" @mouseenter="hover($refs.wave)">
-      <svg width="22" height="12" viewBox="0 0 22 12" fill="none" ref="wave">
-        <path
-          d="M1 7.2623L2.28173 3.6062C3.5467 -0.00206464 8.62677 -0.0653153 9.98119 3.51034L11.642 7.89497C13.3586 12.4267 19.909 11.9838 21 7.2623V7.2623"
-          stroke="white"
-          stroke-width="1.2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-        <path
-          d="M1 7.2623L2.28173 3.6062C3.5467 -0.00206464 8.62677 -0.0653153 9.98119 3.51034L11.642 7.89497C13.3586 12.4267 19.909 11.9838 21 7.2623V7.2623"
-          stroke="white"
-          stroke-width="1.2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
-    </button>
+    <div class="sound ui-btn">
+      <SoundBar />
+    </div>
 
-    <button
-      class="circles ui-btn"
-      @mouseenter="mouseenter"
-      @mouseleave="mouseout"
-    >
-      <div class="circles__i" ref="circle1"></div>
-      <div class="circles__i" ref="circle2"></div>
-      <div class="circles__i" ref="circle3"></div>
-    </button>
+    <MenuButton />
   </div>
 </template>
 
 <script>
 import anime from 'animejs'
+import MenuButton from '@/MenuButton'
+import SoundBar from '@/SoundBar'
 
 const easing = 'easeInOutCirc'
 
@@ -79,7 +58,7 @@ const animate = (first, second) => {
     targets: first,
     easing,
     duration: 200,
-    opacity: 0.1
+    opacity: 0.3
   })
 
   anime({
@@ -101,108 +80,22 @@ const animate = (first, second) => {
 
 export default {
   name: 'Main',
-  data: () => ({
-    circleAnimating: false
-  }),
+  components: {
+    MenuButton,
+    SoundBar
+  },
   methods: {
     hover(el) {
       const first = el.querySelector('path:nth-child(1)')
       const second = el.querySelector('path:nth-child(2)')
 
       animate(first, second)
-    },
-    mouseenter() {
-      const c1 = this.$refs.circle1
-      const c2 = this.$refs.circle2
-      const c3 = this.$refs.circle3
-
-      if (this.circleAnimating) {
-        anime.remove([c1, c2, c3])
-      }
-
-      const tl = anime.timeline({
-        begin: () => {
-          this.circleAnimating = true
-        },
-        complete: () => {
-          this.circleAnimating = false
-        }
-      })
-
-      anime.set(c2, {
-        translateX: '4px',
-        translateY: '-10px',
-        scale: 0
-      })
-
-      tl.add({
-        targets: c1,
-        duration: 350,
-        translateX: '4px',
-        scaleY: 0.3,
-        easing: 'easeInQuint'
-      })
-        .add(
-          {
-            targets: c3,
-            duration: 350,
-            translateX: '-6px',
-            easing: 'easeInQuint'
-          },
-          '-=350'
-        )
-        .add({
-          targets: c2,
-          duration: 400,
-          scale: 1,
-          easing: 'easeOutQuint'
-        })
-    },
-    mouseout() {
-      const c1 = this.$refs.circle1
-      const c2 = this.$refs.circle2
-      const c3 = this.$refs.circle3
-
-      if (this.circleAnimating) {
-        anime.remove([c1, c2, c3])
-      }
-
-      const tl = anime.timeline({
-        begin: () => {
-          this.circleAnimating = true
-        },
-        complete: () => {
-          this.circleAnimating = false
-        }
-      })
-
-      tl.add({
-        targets: c2,
-        duration: 300,
-        translateX: '4px',
-        translateY: '-10px',
-        scale: 0,
-        easing: 'easeInQuint'
-      }).add({
-        targets: [c1, c3],
-        duration: 250,
-        translateX: '0px',
-        scaleY: 1,
-        easing: 'easeOutQuint'
-      })
     }
   }
 }
 </script>
 
 <style lang="sass" scoped>
-.is-firefox
-  .circles
-    padding-top: calc(var(--unit-v))
-  .wave
-    padding-bottom: calc(var(--unit-v))
-
-
 .ui-btn
   width: 80px
   height: 80px
@@ -225,45 +118,13 @@ export default {
   padding-bottom: var(--unit-v)
   align-items: flex-end
 
-.wave
+.sound
   position: fixed
   top: calc(var(--vh, 1vh) * 100 - 80px)
   right: 0
 
   padding-right: var(--unit-h)
-  padding-bottom: calc(var(--unit-v) - 22px)
+  padding-bottom: calc(var(--unit-v))
   align-items: flex-end
   justify-content: flex-end
-
-.circles
-  position: fixed
-
-  top: 0
-  right: 0
-
-  justify-content: flex-end
-  padding-top: calc(var(--unit-v) - 26px)
-  padding-right: var(--unit-h)
-
-  &__i
-    width: 4px
-    height: 4px
-
-    border-radius: 50%
-    background: #fff
-    transform-origin: 50% 50%
-
-    &:nth-child(1)
-      position: absolute
-      right: calc(var(--unit-h) + 10px)
-
-    &:nth-child(2)
-      position: absolute
-      right: var(--unit-h)
-
-      width: 24px
-      height: 24px
-      border: 1px solid #fff
-      background: 0
-      transform: translate(4px, -10px) scale(0)
 </style>
