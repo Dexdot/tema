@@ -97,7 +97,7 @@ export default {
 
 <style lang="sass" scoped>
 .ui-btn
-  width: 80px
+  min-width: 80px
   height: 80px
   display: flex
   position: fixed

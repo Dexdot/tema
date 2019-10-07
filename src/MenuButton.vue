@@ -106,7 +106,7 @@ export default {
     padding-top: calc(var(--unit-v))
 
 .circles
-  width: 136px
+  width: calc(var(--unit-h) + 88px)
   height: 80px
   display: flex
 
@@ -157,4 +157,7 @@ export default {
   opacity: 0
   transform: translateX(-16px)
   transition: 0.6s ease
+
+  @media (max-width: 500px)
+    top: calc(var(--unit-v) + 4px)
 </style>
