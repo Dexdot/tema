@@ -153,6 +153,7 @@ export default {
   line-height: 1
   font-size: 12px
   letter-spacing: 0.07em
+  color: #fff
 
   opacity: 0
   transform: translateX(-16px)

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="main">
     <router-link
       class="logo ui-btn"
       to="/"
@@ -96,6 +96,10 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+.main
+  position: relative
+  z-index: 1
+
 .ui-btn
   min-width: 80px
   height: 80px

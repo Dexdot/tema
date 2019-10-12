@@ -9,13 +9,13 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'main',
-      component: () => import('@/Main.vue')
+      name: 'index',
+      component: () => import('@/Index.vue')
+    },
+    {
+      path: '/case/:id',
+      name: 'case',
+      component: () => import('@/Case.vue')
     }
-    // {
-    //   path: '/case/:id',
-    //   name: 'case',
-    //   component: () => import('@/Stories.vue')
-    // }
   ]
 })

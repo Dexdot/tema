@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <Menu :active="isMenuActive" />
+    <Main />
 
     <Scroll ref="scroll">
       <transition
@@ -21,6 +22,7 @@
 
 <script>
 import Menu from '@/Menu'
+import Main from '@/Main.vue'
 import Scroll from '@/Scroll'
 import transitions from '@/transitions/'
 import { isFirefox } from '@/scripts/detect'
@@ -29,6 +31,7 @@ export default {
   name: 'App',
   components: {
     Menu,
+    Main,
     Scroll
   },
   data: () => ({
@@ -91,5 +94,6 @@ body.is-macos:not(.is-safari)
 .is-safari,
 .is-mob
   .scroll-container
+    overflow: unset !important
     height: auto !important
 </style>

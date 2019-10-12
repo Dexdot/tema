@@ -1,5 +1,5 @@
 <template>
-  <div class="scroll-container">
+  <main class="scroll-container">
     <div
       class="scroll-inner"
       ref="inner"
@@ -7,7 +7,7 @@
     >
       <slot></slot>
     </div>
-  </div>
+  </main>
 </template>
 
 <script>

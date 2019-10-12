@@ -1,12 +1,22 @@
 <template>
   <transition name="menu">
     <section class="menu" v-show="active">
-      <div class="menu__overlay"></div>
+      <!-- <div class="menu__overlay"></div> -->
 
       <nav class="menu__nav" @click="$emit('click')">
         <ul>
           <li>
             <router-link class="menu__link" to="/">Cases</router-link>
+          </li>
+          <li>
+            <router-link class="menu__link" to="/case/legenda"
+              >Legenda</router-link
+            >
+          </li>
+          <li>
+            <router-link class="menu__link" to="/case/energotek"
+              >Energotek</router-link
+            >
           </li>
         </ul>
       </nav>
@@ -37,14 +47,14 @@ export default {
     opacity: 0
     transform: translateY(16px)
 
-  .menu__overlay
-    transform: translateY(101%)
+  // .menu__overlay
+  //   transform: translateY(101%)
 
 
 .menu-enter-to
   pointer-events: auto
 
-  .menu__overlay,
+  // .menu__overlay,
   nav li
     opacity: 1
     transform: translateY(0%)
@@ -53,8 +63,8 @@ export default {
 .menu-enter-active
   transition: 1s ease-in-out
 
-  .menu__overlay
-    transition: 0.8s cubic-bezier(0.645, 0.045, 0.355, 1)
+  // .menu__overlay
+  //   transition: 0.8s cubic-bezier(0.645, 0.045, 0.355, 1)
 
 @for $i from 1 through 4
   .menu-enter-active .menu__nav li:nth-child(#{$i})
@@ -68,7 +78,7 @@ export default {
   nav li
     opacity: 1
 
-  .menu__overlay,
+  // .menu__overlay,
   nav li
     transform: translateY(0%)
 
@@ -78,14 +88,14 @@ export default {
   nav li
     opacity: 0
 
-  .menu__overlay
-    transform: translateY(101%)
+  // .menu__overlay
+  //   transform: translateY(101%)
 
 .menu-leave-active
   transition: 1s ease-in-out
 
-  .menu__overlay
-    transition: 0.8s cubic-bezier(0.645, 0.045, 0.355, 1)
+  // .menu__overlay
+  //   transition: 0.8s cubic-bezier(0.645, 0.045, 0.355, 1)
 
 @for $i from 1 through 4
   .menu-leave-active .menu__nav li:nth-child(#{$i})
@@ -103,40 +113,41 @@ export default {
   height: 100vh
   height: calc(var(--vh, 1vh) * 100)
 
-  @media (min-width: 501px)
-    display: none
-
-
+  // @media (min-width: 501px)
+  //   display: none
 
 // Overlay
-.menu__overlay
-  background: #000
-  position: absolute
-  top: 0
-  left: 0
-  width: 100vw
-  height: 100vh
-  height: calc(var(--vh, 1vh) * 100)
+// .menu__overlay
+//   background: #000
+//   position: absolute
+//   top: 0
+//   left: 0
+//   width: 100vw
+//   height: 100vh
+//   height: calc(var(--vh, 1vh) * 100)
 
 .menu__nav
   z-index: 1
   position: absolute
   top: 50%
-  right: 0
+  left: 12%
   transform: translateY(-50%)
 
-  text-align: right
-
   @media (max-width: 500px)
-    right: var(--unit-h)
+    left: var(--unit-h)
+
+  li
+    line-height: 1
+    font-size: 72px
 
   li:not(:last-child)
-    margin-bottom: 4px
+    margin-bottom: 0.56em
 
 .menu__link
-  line-height: 1
-  font-size: 48px
-  color: #fff !important
+  display: block
+  
+  +wood(u)
+  color: #fff
   transition: 0.25s ease
 
 .menu__nav:hover

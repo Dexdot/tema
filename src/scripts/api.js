@@ -20,21 +20,35 @@ export const fetchCase = slug =>
       })
   })
 
-export const fetchCases = ctx =>
+export const fetchCases = (ctx, options) =>
   new Promise(resolve => {
-    client.getEntry('MAIN_CASES_ID').then(entry => {
-      ctx.$store.dispatch('addCases', entry.fields.list)
-      resolve(entry.fields.list)
-    })
+    client
+      .getEntries({
+        content_type: 'case',
+        ...options
+      })
+      .then(({ items }) => {
+        ctx.$store.dispatch('addCases', items)
+        resolve(items)
+      })
   })
+
+// export const fetchCases = ctx =>
+//   new Promise(resolve => {
+//     client.getEntry('MAIN_CASES_ID').then(entry => {
+//       ctx.$store.dispatch('addCases', entry.fields.list)
+//       resolve(entry.fields.list)
+//     })
+//   })
 
 export const getCases = ctx =>
   new Promise(resolve => {
     const isStoreContainsCases =
-      ctx.$store.getters.cases && ctx.$store.getters.cases.length > 0
+      ctx.$store.getters['cases/cases'] &&
+      ctx.$store.getters['cases/cases'].length > 0
 
     if (isStoreContainsCases) {
-      resolve(ctx.$store.getters.cases)
+      resolve(ctx.$store.getters['cases/cases'])
     } else {
       fetchCases(ctx).then(cases => {
         resolve(cases)
@@ -44,7 +58,7 @@ export const getCases = ctx =>
 
 export const getCase = (ctx, slug) =>
   new Promise(resolve => {
-    const projectFromStore = ctx.$store.getters.cases.find(
+    const projectFromStore = ctx.$store.getters['cases/cases'].find(
       el => el.fields.slug === 'slug'
     )
 
