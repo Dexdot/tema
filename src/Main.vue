@@ -42,7 +42,7 @@
       <SoundBar />
     </div>
 
-    <MenuButton />
+    <MenuButton @click="$emit('toggle-menu')" :isMenuActive="isMenuActive" />
   </div>
 </template>
 
@@ -80,6 +80,9 @@ const animate = (first, second) => {
 
 export default {
   name: 'Main',
+  props: {
+    isMenuActive: { type: Boolean, default: false }
+  },
   components: {
     MenuButton,
     SoundBar
@@ -98,7 +101,7 @@ export default {
 <style lang="sass" scoped>
 .main
   position: relative
-  z-index: 1
+  z-index: 2
 
 .ui-btn
   min-width: 80px

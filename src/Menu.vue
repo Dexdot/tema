@@ -138,7 +138,7 @@ export default {
 
   li
     line-height: 1
-    font-size: 72px
+    +yo('font-size', (375px: 40px, 1440px: 56px, 1920px: 72px))
 
   li:not(:last-child)
     margin-bottom: 0.56em

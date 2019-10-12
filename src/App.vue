@@ -1,22 +1,24 @@
 <template>
   <div id="app">
     <Menu :active="isMenuActive" />
-    <Main />
+    <Main :isMenuActive="isMenuActive" @toggle-menu="toggleMenu" />
 
-    <Scroll ref="scroll">
-      <transition
-        v-if="mounted"
-        @enter="enter"
-        @leave="leave"
-        :css="false"
-        mode="out-in"
-      >
-        <router-view
-          :key="$route.path"
-          :scroll="$refs.scroll && $refs.scroll.scroll"
-        />
-      </transition>
-    </Scroll>
+    <div :class="['scroll', { hidden: isMenuActive }]">
+      <Scroll ref="scroll">
+        <transition
+          v-if="mounted"
+          @enter="enter"
+          @leave="leave"
+          :css="false"
+          mode="out-in"
+        >
+          <router-view
+            :key="$route.path"
+            :scroll="$refs.scroll && $refs.scroll.scroll"
+          />
+        </transition>
+      </Scroll>
+    </div>
   </div>
 </template>
 
@@ -96,4 +98,13 @@ body.is-macos:not(.is-safari)
   .scroll-container
     overflow: unset !important
     height: auto !important
+</style>
+
+<style lang="sass" scoped>
+.scroll
+  transition: opacity 0.25s ease
+  &.hidden
+    opacity: 0
+    pointer-events: none
+    user-select: none
 </style>

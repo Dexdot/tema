@@ -1,5 +1,10 @@
 <template>
-  <button class="circles" @mouseenter="mouseenter" @mouseleave="mouseout">
+  <button
+    class="circles"
+    @click="$emit('click')"
+    @mouseenter="mouseenter"
+    @mouseleave="mouseout"
+  >
     <div class="circles__i" ref="circle1"></div>
     <div class="circles__i" ref="circle2"></div>
     <div class="circles__i" ref="circle3"></div>
@@ -12,11 +17,23 @@ import anime from 'animejs'
 
 export default {
   name: 'MenuButton',
+  props: {
+    isMenuActive: { type: Boolean, default: false }
+  },
   data: () => ({
+    isHovered: false,
     isAnimating: false
   }),
   methods: {
     mouseenter() {
+      this.isHovered = true
+      if (!this.isMenuActive) this.active()
+    },
+    mouseout() {
+      this.isHovered = false
+      if (!this.isMenuActive) this.deactive()
+    },
+    active() {
       const c1 = this.$refs.circle1
       const c2 = this.$refs.circle2
       const c3 = this.$refs.circle3
@@ -63,7 +80,7 @@ export default {
           easing: 'easeOutQuint'
         })
     },
-    mouseout() {
+    deactive() {
       const c1 = this.$refs.circle1
       const c2 = this.$refs.circle2
       const c3 = this.$refs.circle3
@@ -95,6 +112,15 @@ export default {
         scaleY: 1,
         easing: 'easeOutQuint'
       })
+    }
+  },
+  watch: {
+    isMenuActive() {
+      if (this.isMenuActive && !this.isHovered) {
+        this.active()
+      } else if (!this.isMenuActive) {
+        this.deactive()
+      }
     }
   }
 }
