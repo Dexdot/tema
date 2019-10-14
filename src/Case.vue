@@ -9,20 +9,78 @@
           <p class="case__date">{{ content.date }}</p>
           <a class="case__url" :href="content.url">Visit site</a>
         </div>
-        <img
-          :class="{ full: img.fields.title.endsWith('--full') }"
+        <div
+          :class="[
+            'case__img',
+            { 'case__img--full': img.fields.title.endsWith('--full') }
+          ]"
           v-for="img in content.images"
           :key="img.sys.id"
-          :src="img.fields.file.url"
-          :alt="img.fields.title"
-        />
+          ref="images"
+        >
+          <img :src="img.fields.file.url" :alt="img.fields.title" />
+        </div>
       </div>
     </div>
   </article>
 </template>
 
 <script>
+import anime from 'animejs'
 import { getCase } from '@/scripts/api'
+
+// window.anime = anime
+
+// // Fullscreen image
+// const fsImage = {
+//   animate: el => {
+//     anime({
+//       targets: el.querySelector('img'),
+//       scaleX: 1,
+//       scaleY: 1,
+//       duration: 2500,
+//       easing: 'easeOutQuad'
+//     })
+//   },
+//   reset: el => {
+//     anime.set(el.querySelector('img'), {
+//       scaleX: 1.5,
+//       scaleY: 1.5
+//     })
+//   }
+// }
+
+// // Image
+// const image = {
+//   animate: el => {
+//     anime({
+//       targets: el.querySelector('img'),
+//       scaleX: 1,
+//       scaleY: 1,
+//       duration: 800,
+//       easing: 'easeOutQuad'
+//     })
+
+//     anime({
+//       targets: el,
+//       scaleX: 1,
+//       scaleY: 1,
+//       duration: 800,
+//       easing: 'easeOutQuad'
+//     })
+//   },
+//   reset: el => {
+//     anime.set(el.querySelector('img'), {
+//       scaleX: 1.5,
+//       scaleY: 1.5
+//     })
+
+//     anime.set(el, {
+//       scaleX: 0.7,
+//       scaleY: 0.7
+//     })
+//   }
+// }
 
 export default {
   name: 'Case',
@@ -31,6 +89,36 @@ export default {
   }),
   async created() {
     this.content = await getCase(this, this.$route.params.id)
+    this.$nextTick(() => {
+      this.observe()
+    })
+  },
+  methods: {
+    observe() {
+      const observer = new IntersectionObserver(
+        entries => {
+          entries.forEach(({ target, isIntersecting }) => {
+            // const isFullscreen = target.classList.contains('case__img--full')
+            // const animObj = isFullscreen ? fsImage : image
+
+            if (isIntersecting) {
+              target.classList.add('visible')
+              // animObj.animate(target)
+            } else {
+              target.classList.remove('visible')
+              // console.log('not ineter', target)
+
+              // animObj.reset(target)
+            }
+          })
+        },
+        { threshold: [0, 0.5, 1] }
+      )
+
+      this.$refs.images.forEach(img => {
+        observer.observe(img)
+      })
+    }
   }
 }
 </script>
@@ -129,22 +217,50 @@ export default {
       opacity: 0.6
       font-size: 14px
 
+.case__img
+  overflow: hidden
+  position: relative
+  width: 100%
+
+  &:not(:last-child):not(.case__img--full)
+    margin-bottom: 8.2vh
+
+  &, & img
+    will-change: transform
+
   img
     display: block
     max-width: 100%
     width: 100%
     height: auto
-    &:not(:last-child)
-      margin-bottom: 8.2vh
 
-  img.full
-    margin-top: 17vh
-    margin-bottom: 17vh
-    margin-left: -12.9vw
-    max-width: unset
-    width: 75.8vw
+.case__img--full
+  margin-top: 17vh
+  margin-bottom: 17vh
+  margin-left: -12.9vw
+  // max-width: unset
+  width: 75.8vw
+  @media (max-width: 800px)
+    width: 80vw
+    margin-left: -8vw
 
-    @media (max-width: 800px)
-      width: 80vw
-      margin-left: -8vw
+.case__img:not(.case__img--full)
+  transform: scaleX(0.7) scaleY(0.7) scaleZ(1)
+  transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+
+  img
+    transform: scaleX(1.5) scaleY(1.5) scaleZ(1)
+    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+
+  &.visible,
+  &.visible img
+    transform: scaleX(1) scaleY(1) scaleZ(1)
+
+.case__img.case__img--full
+  img
+    transform: scaleX(1.5) scaleY(1.5) scaleZ(1)
+    transition: transform 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+
+  &.visible img
+    transform: scaleX(1) scaleY(1) scaleZ(1)
 </style>
