@@ -26,61 +26,7 @@
 </template>
 
 <script>
-import anime from 'animejs'
 import { getCase } from '@/scripts/api'
-
-// window.anime = anime
-
-// // Fullscreen image
-// const fsImage = {
-//   animate: el => {
-//     anime({
-//       targets: el.querySelector('img'),
-//       scaleX: 1,
-//       scaleY: 1,
-//       duration: 2500,
-//       easing: 'easeOutQuad'
-//     })
-//   },
-//   reset: el => {
-//     anime.set(el.querySelector('img'), {
-//       scaleX: 1.5,
-//       scaleY: 1.5
-//     })
-//   }
-// }
-
-// // Image
-// const image = {
-//   animate: el => {
-//     anime({
-//       targets: el.querySelector('img'),
-//       scaleX: 1,
-//       scaleY: 1,
-//       duration: 800,
-//       easing: 'easeOutQuad'
-//     })
-
-//     anime({
-//       targets: el,
-//       scaleX: 1,
-//       scaleY: 1,
-//       duration: 800,
-//       easing: 'easeOutQuad'
-//     })
-//   },
-//   reset: el => {
-//     anime.set(el.querySelector('img'), {
-//       scaleX: 1.5,
-//       scaleY: 1.5
-//     })
-
-//     anime.set(el, {
-//       scaleX: 0.7,
-//       scaleY: 0.7
-//     })
-//   }
-// }
 
 export default {
   name: 'Case',
@@ -98,17 +44,10 @@ export default {
       const observer = new IntersectionObserver(
         entries => {
           entries.forEach(({ target, isIntersecting }) => {
-            // const isFullscreen = target.classList.contains('case__img--full')
-            // const animObj = isFullscreen ? fsImage : image
-
             if (isIntersecting) {
               target.classList.add('visible')
-              // animObj.animate(target)
             } else {
               target.classList.remove('visible')
-              // console.log('not ineter', target)
-
-              // animObj.reset(target)
             }
           })
         },

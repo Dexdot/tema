@@ -1,21 +1,16 @@
 <template>
   <div>
-    <h1>Maaain</h1>
+    <Slider :scroll="scroll" />
   </div>
 </template>
 
 <script>
+import Slider from '@/Slider'
 export default {
-  name: 'Index'
+  name: 'Index',
+  props: ['scroll'],
+  components: {
+    Slider
+  }
 }
 </script>
-
-<style lang="sass" scoped>
-div
-  position: relative
-  width: 100vw
-  height: 100vh
-  display: flex
-  align-items: center
-  justify-content: center
-</style>

@@ -28,18 +28,10 @@ export const fetchCases = (ctx, options) =>
         ...options
       })
       .then(({ items }) => {
-        ctx.$store.dispatch('addCases', items)
+        ctx.$store.dispatch('cases/addCases', items)
         resolve(items)
       })
   })
-
-// export const fetchCases = ctx =>
-//   new Promise(resolve => {
-//     client.getEntry('MAIN_CASES_ID').then(entry => {
-//       ctx.$store.dispatch('addCases', entry.fields.list)
-//       resolve(entry.fields.list)
-//     })
-//   })
 
 export const getCases = ctx =>
   new Promise(resolve => {
