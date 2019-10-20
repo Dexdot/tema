@@ -59,6 +59,8 @@
 import three from '@/gl/three'
 import Slider from '@/gl/Slider'
 
+import { getCases } from '@/scripts/api'
+
 const images = {}
 
 export default {
@@ -67,8 +69,10 @@ export default {
   data: () => ({
     slider: null
   }),
-  mounted() {
-    this.$store.getters['cases/cases'].forEach(({ fields }) => {
+  async mounted() {
+    const cases = await getCases(this)
+
+    cases.forEach(({ fields }) => {
       images[fields.slug] = fields.map.fields.file.url
     })
 
