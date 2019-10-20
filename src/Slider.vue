@@ -85,7 +85,7 @@ export default {
   methods: {
     onClick() {
       this.$router.push(
-        `/case/${Object.keys(this.slider.images)[this.slider.index]}`
+        `/case/${this.slider.sceneParams[this.slider.index].slug}`
       )
     }
   },

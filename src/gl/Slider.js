@@ -1,4 +1,5 @@
 import { TweenMax, Power2 } from 'gsap'
+import loop from '@/scripts/loop'
 
 let THREE = null
 
@@ -57,6 +58,7 @@ export default class Slider {
     this.sceneParams = {
       // VK
       0: {
+        slug: 'vk',
         x: -17204,
         y: 1000,
         z: 23876,
@@ -66,6 +68,7 @@ export default class Slider {
       },
       // AIR ENERGY
       1: {
+        slug: 'air-energy',
         x: -7776,
         y: 4346,
         z: 11754,
@@ -75,6 +78,7 @@ export default class Slider {
       },
       // LEGENDA
       2: {
+        slug: 'legenda',
         x: 305,
         y: -1715,
         z: 2999,
@@ -84,6 +88,7 @@ export default class Slider {
       },
       // TWP
       3: {
+        slug: 'twp',
         x: 2999,
         y: -400,
         z: 0,
@@ -93,6 +98,7 @@ export default class Slider {
       },
       // ENERGOTEK
       4: {
+        slug: 'energotek',
         x: 305,
         y: 1652,
         z: -2600,
@@ -102,6 +108,7 @@ export default class Slider {
       },
       // CHE Group
       5: {
+        slug: 'che-group',
         x: -4009,
         y: -3062,
         z: -7776,
@@ -111,6 +118,7 @@ export default class Slider {
       },
       // NEUROHIVE
       6: {
+        slug: 'neurohive',
         x: -7776,
         y: 1600,
         z: -16531,
@@ -363,7 +371,6 @@ export default class Slider {
     )
     this.scene.add(this.light)
 
-    this.RAF = 0
     this.start()
   }
 
@@ -389,8 +396,6 @@ export default class Slider {
   }
 
   animate() {
-    this.RAF = requestAnimationFrame(this.animate.bind(this))
-
     this.time += 0.001
 
     for (let i = 0; i < 7; i++) {
@@ -402,11 +407,11 @@ export default class Slider {
   }
 
   start() {
-    this.animate()
+    loop.add(this.animate.bind(this), 'slider')
   }
 
   pause() {
-    cancelAnimationFrame(this.RAF)
+    loop.remove('slider', true)
   }
 
   destroy() {
@@ -565,7 +570,7 @@ export default class Slider {
 
   indexControl(direction) {
     if (this.moving) return false
-    
+
     let floatIndex = { value: 0 }
     let materialChanged = false
 
