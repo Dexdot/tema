@@ -43,11 +43,13 @@ export default {
   name: 'App',
   data: () => ({
     scroll: {
-      isNotScrolling: true,
+      disable: false,
+      scrollIsStopped: true,
       val: 0,
       translate: 0,
       deltaY: 0,
-      winHeight: 0
+      winHeight: 0,
+      counter: 0
     },
     vs: null,
     detect: {}
@@ -72,7 +74,7 @@ export default {
 
     if (this.detect.isSafari || this.detect.isMobileDevice) {
       window.addEventListener('scroll', this.defaultScroll.bind(this))
-      // this.scroll.isNotScrolling = true
+      // this.scroll.scrollIsStopped = true
     } else {
       this.vs.on(this.onScroll)
       loop.add(this.checkSmooth.bind(this), 'checkSmooth')
@@ -88,7 +90,10 @@ export default {
       this.scroll.winHeight = window.innerHeight
     },
     onScroll({ deltaY }) {
-      // this.scroll.isNotScrolling = false
+      if (this.scroll.disable) return false
+
+      // this.scroll.scrollIsStopped = false
+      this.scroll.counter++
 
       this.scroll.deltaY = deltaY
       const scroll = this.scroll.val + -1 * deltaY
@@ -112,7 +117,7 @@ export default {
           roundTranslate >= roundScroll - 1 &&
           roundTranslate <= roundScroll + 1
         ) {
-          // this.scroll.isNotScrolling = true
+          // this.scroll.scrollIsStopped = true
           this.scroll.translate = Math.round(
             lerp(this.scroll.translate, this.scroll.val, 0.03)
           )
@@ -122,11 +127,12 @@ export default {
         //   roundTranslate >= roundScroll - 50 &&
         //   roundTranslate <= roundScroll + 50
         // ) {
-        //   this.scroll.isNotScrolling = true
+        //   this.scroll.scrollIsStopped = true
         // }
       }
     },
     defaultScroll({ deltaY }) {
+      this.scroll.counter++
       this.scroll.deltaY = deltaY
       this.scroll.val = window.pageYOffset
     }

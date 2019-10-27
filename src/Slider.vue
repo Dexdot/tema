@@ -56,7 +56,9 @@
 </template>
 
 <script>
-import three from '@/gl/three'
+import anime from 'animejs'
+
+import three from '@/gl/ThreeSlider'
 import Slider from '@/gl/Slider'
 
 import { getCases } from '@/scripts/api'
@@ -84,7 +86,15 @@ export default {
     this.slider.indexControl('next')
   },
   beforeDestroy() {
-    this.slider.destroy()
+    anime({
+      targets: this.$el,
+      opacity: 0,
+      duration: 200,
+      easing: 'easeInCubic',
+      complete: () => {
+        this.slider.destroy()
+      }
+    })
   },
   methods: {
     onClick() {
@@ -94,7 +104,7 @@ export default {
     }
   },
   watch: {
-    'scroll.deltaY'() {
+    'scroll.counter'() {
       const dir = this.scroll.deltaY < 0 ? 'next' : 'back'
       this.slider.indexControl(dir)
     }

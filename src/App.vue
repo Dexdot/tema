@@ -15,6 +15,7 @@
           <router-view
             :key="$route.path"
             :scroll="$refs.scroll && $refs.scroll.scroll"
+            @disable-scroll="disableScroll"
           />
         </transition>
       </Scroll>
@@ -51,8 +52,17 @@ export default {
     })
   },
   methods: {
+    disableScroll(v) {
+      this.$refs.scroll.scroll.disable = v
+    },
     toggleMenu() {
       this.isMenuActive = !this.isMenuActive
+      this.disableScroll(this.isMenuActive)
+    },
+    resetScroll() {
+      this.$refs.scroll.scroll.val = 0
+      this.$refs.scroll.scroll.translate = 0
+      window.scrollTo(0, 0)
     },
     async enter(el, done) {
       await transitions['fade'].enter(el)
@@ -62,11 +72,7 @@ export default {
       if (this.isMenuActive) this.toggleMenu()
 
       await transitions['fade'].leave(el)
-
-      this.$refs.scroll.scroll.val = 0
-      this.$refs.scroll.scroll.translate = 0
-      window.scrollTo(0, 0)
-
+      this.resetScroll()
       done()
     }
   },

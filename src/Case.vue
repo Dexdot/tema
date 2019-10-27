@@ -1,6 +1,14 @@
 <template>
   <article class="case">
-    <h1 class="case__title">{{ content.title }}</h1>
+    <div
+      class="case__fixed"
+      :style="{ transform: `translate3d(0, ${this.scroll.translate}px, 0)` }"
+    >
+      <Inside ref="scene" />
+      <h1 class="case__title">
+        <span>{{ content.title }}</span>
+      </h1>
+    </div>
     <div class="case__container">
       <div class="case__content">
         <div class="case__caption">
@@ -22,14 +30,25 @@
         </div>
       </div>
     </div>
+
+    <Next @complete="leave" />
   </article>
 </template>
 
 <script>
+import Next from '@/Next'
+import Inside from '@/Inside'
 import { getCase } from '@/scripts/api'
+
+import anime from 'animejs'
 
 export default {
   name: 'Case',
+  components: {
+    Inside,
+    Next
+  },
+  props: ['scroll'],
   data: () => ({
     content: {}
   }),
@@ -37,9 +56,72 @@ export default {
     this.content = await getCase(this, this.$route.params.id)
     this.$nextTick(() => {
       this.observe()
+      this.enter()
     })
   },
   methods: {
+    enter() {
+      // Lock scroll
+      this.$emit('disable-scroll', true)
+
+      // Show canvas
+      anime({
+        targets: '.inside',
+        opacity: 1,
+        duration: 400,
+        easing: 'easeInOutSine',
+        complete: async () => {
+          // Animate enter scene
+          await this.$refs.scene.inside.enter()
+
+          // Show title
+          anime.set('.case__title span', { translateY: '0%' })
+
+          // Unlock scroll
+          this.$emit('disable-scroll', false)
+
+          // Show content
+          anime({
+            targets: '.case__container',
+            opacity: 1,
+            duration: 300,
+            easing: 'easeOutCubic'
+          })
+        }
+      })
+    },
+    leave() {
+      // Lock scroll
+      this.$emit('disable-scroll', true)
+
+      // Hide content
+      anime({
+        targets: '.case__container, .case__title span',
+        opacity: 0,
+        duration: 200,
+        easing: 'easeInCubic',
+        complete: async () => {
+          // Animate back scene
+          await this.$refs.scene.inside.back()
+
+          // Hide & destroy
+          anime({
+            targets: this.$el,
+            opacity: 0,
+            duration: 200,
+            easing: 'easeInCubic',
+            complete: () => {
+              this.$refs.scene.inside.destroy()
+      // Unlock scroll
+      this.$emit('disable-scroll', false)
+
+              // Go main
+              this.$router.push('/')
+            }
+          })
+        }
+      })
+    },
     observe() {
       const observer = new IntersectionObserver(
         entries => {
@@ -67,7 +149,17 @@ export default {
 
 .case
   position: relative
-  padding: calc(100vh + 80px) 0
+  padding-top: 101vh
+
+.case__fixed
+  position: absolute
+  top: 50vh
+  left: 50%
+
+.case__fixed .inside
+  transform: translate(-50%, -50%)
+  pointer-events: none
+  opacity: 0
 
 .case__title
   +wood(m)
@@ -76,10 +168,13 @@ export default {
   text-align: center
   letter-spacing: 0.02em
 
-  position: absolute
-  top: 50vh
-  left: 50%
+  overflow: hidden
   transform: translate(-50%, -50%)
+
+  span
+    display: block
+    transform: translateY(110%)
+    transition: transform 0.8s ease
 
 .case__caption
   position: relative
@@ -122,6 +217,11 @@ export default {
   margin-left: auto
   margin-right: auto
   width: 75.8vw
+
+  position: relative
+
+  pointer-events: none
+  opacity: 0
 
   @media (max-width: 800px)
     width: 80vw
