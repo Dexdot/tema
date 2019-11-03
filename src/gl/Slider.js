@@ -9,6 +9,10 @@ export default class Slider {
     THREE = three
     this.images = images
 
+    // this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(
+    //   navigator.userAgent
+    // )
+
     // Scene
     this.scene = new THREE.Scene()
     this.camera = new THREE.PerspectiveCamera(
@@ -16,6 +20,7 @@ export default class Slider {
       window.innerWidth / window.innerHeight,
       0.1,
       60000
+      // this.isMobile ? 750 : 60000
     )
     this.scene.background = new THREE.Color(0x000000)
 
@@ -127,6 +132,7 @@ export default class Slider {
         }
       }
     }
+
     this.arrB = []
     this.arrCurves = []
     this.arrOrbits = []
@@ -178,79 +184,17 @@ export default class Slider {
     this.fShader = THREE.FresnelShader
 
     // Camera position
-    this.camera.position.z = 1642
-    this.camera.position.set(7277, 634, 27)
+    // this.camera.position.z = 1642
+    // this.camera.position.set(7277, 634, 27)
     this.camera.lookAt(this.scene.position)
 
     this.bigtestgeometry = new THREE.IcosahedronGeometry(500, 4)
-
-    let tessellateModifier = new THREE.TessellateModifier(60)
-    tessellateModifier.modify(this.bigtestgeometry)
-    this.bigtestgeometry = new THREE.BufferGeometry().fromGeometry(
-      this.bigtestgeometry
-    )
-
-    let numFaces = this.bigtestgeometry.attributes.position.count / 3
-
-    let displacement = new Float32Array(numFaces * 9)
-    let anim = new Float32Array(numFaces * 9)
-
-    for (let f = 0; f < numFaces; f++) {
-      let index = 9 * f
-      let d = 10 * (0.5 - Math.random())
-
-      for (let i = 0; i < 3; i++) {
-        displacement[index + 3 * i] = d
-        displacement[index + 3 * i + 1] = d
-        displacement[index + 3 * i + 2] = d
-      }
-    }
-
-    let offsets = []
-
-    for (
-      let i = 0;
-      i < this.bigtestgeometry.attributes.position.count * 3;
-      i += 9
-    ) {
-      let rand = Math.random()
-      offsets.push(
-        this.bigtestgeometry.attributes.position.array[i],
-        this.bigtestgeometry.attributes.position.array[i],
-        this.bigtestgeometry.attributes.position.array[i]
-      )
-    }
-
-    // Displacement
-    this.bigtestgeometry.addAttribute(
-      'displacement',
-      new THREE.BufferAttribute(displacement, 3)
-    )
-
-    // Position
-    this.bigtestgeometry.addAttribute(
-      'position',
-      new THREE.BufferAttribute(
-        this.bigtestgeometry.attributes.position.array,
-        3
-      ).setDynamic(true)
-    )
-
-    // Offset
-    this.bigtestgeometry.addAttribute(
-      'offset',
-      new THREE.BufferAttribute(new Float32Array(offsets), 1)
-    )
-
-    // Bounding sphere
-    this.bigtestgeometry.computeBoundingSphere()
-    this.bigtestgeometry.boundingSphere.radius = 1500
 
     // MESH
     for (let i = 0; i < 7; i++) {
       let meshBMaterial = new THREE.ShaderMaterial({
         defines: {
-          DISPERSION_SAMPLES: 50
+          DISPERSION_SAMPLES: 20
         },
         uniforms: {
           mRefractionRatio: { type: 'f', value: 1.02 },
@@ -268,14 +212,21 @@ export default class Slider {
           cameraPosition: { value: this.camera.position },
           tCube: {
             type: 't',
-            value: new THREE.CubeTextureLoader().load([
-              this.sceneParams[i].uniformsOut.cubeMap,
-              this.sceneParams[i].uniformsOut.cubeMap,
-              this.sceneParams[i].uniformsOut.cubeMap,
-              this.sceneParams[i].uniformsOut.cubeMap,
-              this.sceneParams[i].uniformsOut.cubeMap,
-              this.sceneParams[i].uniformsOut.cubeMap
-            ])
+            value: new THREE.CubeTextureLoader().load(
+              [
+                this.sceneParams[i].uniformsOut.cubeMap,
+                this.sceneParams[i].uniformsOut.cubeMap,
+                this.sceneParams[i].uniformsOut.cubeMap,
+                this.sceneParams[i].uniformsOut.cubeMap,
+                this.sceneParams[i].uniformsOut.cubeMap,
+                this.sceneParams[i].uniformsOut.cubeMap
+              ],
+              () => {
+                if (i === 6) {
+                  this.container.dispatchEvent(new Event('complete'))
+                }
+              }
+            )
           }
         },
         vertexShader: this.fShader.vertexShader,
@@ -294,13 +245,11 @@ export default class Slider {
         meshB.position.y + 300,
         Math.sin((2 * Math.PI * (i - 0.1)) / 7) * 7100 + 0
       )
-
       let OCurveControlVevtor = new THREE.Vector3(
         Math.cos((2 * Math.PI * i) / 7) * 7100 + 0,
         meshB.position.y + 300,
         Math.sin((2 * Math.PI * i) / 7) * 7100 + 0
       )
-
       let OCurveEndVector = new THREE.Vector3(
         Math.cos((2 * Math.PI * (i + 0.1)) / 7) * 7100 + 0,
         meshB.position.y + 300,
@@ -370,6 +319,12 @@ export default class Slider {
       this.camera.position.z
     )
     this.scene.add(this.light)
+    this.camera.position.set(
+      this.arrOrbits[this.index].getPointAt(0.5).x,
+      this.arrOrbits[this.index].getPointAt(0.5).y,
+      this.arrOrbits[this.index].getPointAt(0.5).z
+    )
+    this.camera.lookAt(this.scene.position)
 
     this.start()
   }

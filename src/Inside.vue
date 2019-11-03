@@ -5,8 +5,6 @@
 </template>
 
 <script>
-import anime from 'animejs'
-
 import three from '@/gl/ThreeInside'
 import Inside from '@/gl/Inside'
 
@@ -16,21 +14,14 @@ export default {
     inside: null
   }),
   mounted() {
+    const selector = '#inside'
     this.inside = new Inside({
-      selector: '#inside',
+      selector,
       url: 'https://lexa307.github.io/inside/textures/cubemaps/Frame 9.8.jpg',
       three
     })
-  },
-  beforeDestroy() {
-    anime({
-      targets: this.$el,
-      opacity: 0,
-      duration: 200,
-      easing: 'easeInCubic',
-      complete: () => {
-        this.inside.destroy()
-      }
+    document.querySelector(selector).addEventListener('complete', () => {
+      this.$emit('init', this.inside)
     })
   }
 }
@@ -44,4 +35,10 @@ export default {
 
   width: 100vw
   height: 100vh
+
+#inside
+  transition: opacity 1s cubic-bezier(0.445, 0.05, 0.55, 0.95)
+  opacity: 0
+  &.visible
+    opacity: 1
 </style>

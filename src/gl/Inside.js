@@ -112,6 +112,7 @@ export default class Inside {
 
     this.start()
     this.prepare()
+    this.container.dispatchEvent(new Event('complete'))
   }
 
   initEvents() {

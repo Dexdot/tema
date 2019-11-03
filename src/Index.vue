@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Slider :scroll="scroll" />
+    <Slider :scroll="scroll" @init="onSliderInit" />
   </div>
 </template>
 
@@ -11,6 +11,15 @@ export default {
   props: ['scroll'],
   components: {
     Slider
+  },
+  data: () => ({
+    slider: null
+  }),
+  methods: {
+    onSliderInit(slider) {
+      this.slider = slider
+      this.$el.dispatchEvent(new Event('init-complete'))
+    }
   }
 }
 </script>

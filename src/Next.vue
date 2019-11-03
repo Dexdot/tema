@@ -37,12 +37,10 @@ export default {
 
       const duration = 200
       const show = targets => ({
-        translateY: ['-15%', '0%'],
         targets,
         duration
       })
       const hide = targets => ({
-        translateY: ['0%', '15%'],
         targets,
         duration,
         delay: duration * 1.5

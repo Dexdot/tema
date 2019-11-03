@@ -1,6 +1,5 @@
 import * as THREE from 'three'
 
-import TessellateModifier from '@/gl/TessellateModifier'
 import CopyShader from '@/gl/CopyShader'
 import FresnelShader from '@/gl/FresnelShader'
 import FilmShader from '@/gl/FilmShader'
@@ -11,10 +10,6 @@ import FilmPass from '@/gl/FilmPass'
 
 export default FilmPass(
   ShaderPass(
-    RenderPass(
-      EffectComposer(
-        FilmShader(FresnelShader(CopyShader(TessellateModifier(THREE))))
-      )
-    )
+    RenderPass(EffectComposer(FilmShader(FresnelShader(CopyShader(THREE)))))
   )
 )

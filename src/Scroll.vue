@@ -26,14 +26,16 @@ const detectDevices = () => {
     isMobileDevice: isMobileDevice()
   }
 
+  const body = document.querySelector('body')
+
   if (detect.isMACOS) {
-    document.querySelector('body').classList.add('is-macos')
+    body.classList.add('is-macos')
   }
   if (detect.isSafari) {
-    document.querySelector('body').classList.add('is-safari')
+    body.classList.add('is-safari')
   }
   if (detect.isMobileDevice) {
-    document.querySelector('body').classList.add('is-mob')
+    body.classList.add('is-mob')
   }
 
   return detect
@@ -104,6 +106,8 @@ export default {
       )
     },
     checkSmooth() {
+      if (this.scroll.disable) return false
+
       const roundTranslate = Math.round(this.scroll.translate)
       const roundScroll = Math.round(this.scroll.val)
 

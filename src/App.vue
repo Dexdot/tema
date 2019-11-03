@@ -16,6 +16,7 @@
             :key="$route.path"
             :scroll="$refs.scroll && $refs.scroll.scroll"
             @disable-scroll="disableScroll"
+            ref="view"
           />
         </transition>
       </Scroll>
@@ -65,13 +66,32 @@ export default {
       window.scrollTo(0, 0)
     },
     async enter(el, done) {
-      await transitions['fade'].enter(el)
-      done()
+      const asyncPages = ['index', 'case']
+      const trs = this.dir.to.name
+
+      const go = async () => {
+        await transitions[trs].enter(this.$refs.view)
+        done()
+        this.disableScroll(false)
+      }
+
+      if (asyncPages.includes(trs)) {
+        el.addEventListener('init-complete', () => {
+          go()
+        })
+      } else {
+        go()
+      }
     },
     async leave(el, done) {
-      if (this.isMenuActive) this.toggleMenu()
+      if (this.isMenuActive) {
+        this.toggleMenu()
+      } else {
+        this.disableScroll(true)
+      }
 
-      await transitions['fade'].leave(el)
+      const trs = this.dir.from.name
+      await transitions[trs].leave(this.$refs.view)
       this.resetScroll()
       done()
     }
@@ -99,11 +119,13 @@ body
 body.is-macos:not(.is-safari)
   overflow: hidden
 
-.is-safari,
-.is-mob
+body.is-safari,
+body.is-mob
   .scroll-container
     overflow: unset !important
     height: auto !important
+  .scroll-inner
+    transform: unset !important
 </style>
 
 <style lang="sass" scoped>

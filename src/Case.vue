@@ -4,11 +4,12 @@
       class="case__fixed"
       :style="{ transform: `translate3d(0, ${this.scroll.translate}px, 0)` }"
     >
-      <Inside ref="scene" />
+      <Inside @init="onSceneInit" />
       <h1 class="case__title">
         <span>{{ content.title }}</span>
       </h1>
     </div>
+
     <div class="case__container">
       <div class="case__content">
         <div class="case__caption">
@@ -31,7 +32,7 @@
       </div>
     </div>
 
-    <Next @complete="leave" />
+    <Next @complete="$router.push('/')" />
   </article>
 </template>
 
@@ -39,8 +40,6 @@
 import Next from '@/Next'
 import Inside from '@/Inside'
 import { getCase } from '@/scripts/api'
-
-import anime from 'animejs'
 
 export default {
   name: 'Case',
@@ -50,77 +49,19 @@ export default {
   },
   props: ['scroll'],
   data: () => ({
-    content: {}
+    content: {},
+    scene: null
   }),
   async created() {
     this.content = await getCase(this, this.$route.params.id)
     this.$nextTick(() => {
       this.observe()
-      this.enter()
     })
   },
   methods: {
-    enter() {
-      // Lock scroll
-      this.$emit('disable-scroll', true)
-
-      // Show canvas
-      anime({
-        targets: '.inside',
-        opacity: 1,
-        duration: 400,
-        easing: 'easeInOutSine',
-        complete: async () => {
-          // Animate enter scene
-          await this.$refs.scene.inside.enter()
-
-          // Show title
-          anime.set('.case__title span', { translateY: '0%' })
-
-          // Unlock scroll
-          this.$emit('disable-scroll', false)
-
-          // Show content
-          anime({
-            targets: '.case__container',
-            opacity: 1,
-            duration: 300,
-            easing: 'easeOutCubic'
-          })
-        }
-      })
-    },
-    leave() {
-      // Lock scroll
-      this.$emit('disable-scroll', true)
-
-      // Hide content
-      anime({
-        targets: '.case__container, .case__title span',
-        opacity: 0,
-        duration: 200,
-        easing: 'easeInCubic',
-        complete: async () => {
-          // Animate back scene
-          await this.$refs.scene.inside.back()
-
-          // Hide & destroy
-          anime({
-            targets: this.$el,
-            opacity: 0,
-            duration: 200,
-            easing: 'easeInCubic',
-            complete: () => {
-              this.$refs.scene.inside.destroy()
-      // Unlock scroll
-      this.$emit('disable-scroll', false)
-
-              // Go main
-              this.$router.push('/')
-            }
-          })
-        }
-      })
+    onSceneInit(scene) {
+      this.scene = scene
+      this.$el.dispatchEvent(new Event('init-complete'))
     },
     observe() {
       const observer = new IntersectionObserver(
@@ -159,7 +100,22 @@ export default {
 .case__fixed .inside
   transform: translate(-50%, -50%)
   pointer-events: none
-  opacity: 0
+
+body.is-safari,
+body.is-mob
+  .case__fixed
+    position: fixed
+    top: 0
+    left: 0
+    transform: unset !important
+    width: 100vw
+    height: 100vh
+
+    .inside,
+    .case__title
+      position: absolute
+      top: 50%
+      left: 50%
 
 .case__title
   +wood(m)
@@ -220,7 +176,6 @@ export default {
 
   position: relative
 
-  pointer-events: none
   opacity: 0
 
   @media (max-width: 800px)
