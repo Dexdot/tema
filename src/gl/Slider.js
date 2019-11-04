@@ -64,6 +64,7 @@ export default class Slider {
       // VK
       0: {
         slug: 'vk',
+        title: 'VK',
         x: -17204,
         y: 1000,
         z: 23876,
@@ -74,6 +75,7 @@ export default class Slider {
       // AIR ENERGY
       1: {
         slug: 'air-energy',
+        title: 'Air Energy',
         x: -7776,
         y: 4346,
         z: 11754,
@@ -84,6 +86,7 @@ export default class Slider {
       // LEGENDA
       2: {
         slug: 'legenda',
+        title: 'Legenda',
         x: 305,
         y: -1715,
         z: 2999,
@@ -94,6 +97,7 @@ export default class Slider {
       // TWP
       3: {
         slug: 'twp',
+        title: 'TWP',
         x: 2999,
         y: -400,
         z: 0,
@@ -104,6 +108,7 @@ export default class Slider {
       // ENERGOTEK
       4: {
         slug: 'energotek',
+        title: 'Energotek',
         x: 305,
         y: 1652,
         z: -2600,
@@ -114,6 +119,7 @@ export default class Slider {
       // CHE Group
       5: {
         slug: 'che-group',
+        title: 'Che Group',
         x: -4009,
         y: -3062,
         z: -7776,
@@ -124,6 +130,7 @@ export default class Slider {
       // NEUROHIVE
       6: {
         slug: 'neurohive',
+        title: 'Neurohive',
         x: -7776,
         y: 1600,
         z: -16531,
@@ -223,7 +230,7 @@ export default class Slider {
               ],
               () => {
                 if (i === 6) {
-                  this.container.dispatchEvent(new Event('complete'))
+                  this.container.dispatchEvent(new Event('init-complete'))
                 }
               }
             )
@@ -529,13 +536,21 @@ export default class Slider {
     let floatIndex = { value: 0 }
     let materialChanged = false
 
+    const dispatch = i => {
+      const ev = new CustomEvent('slide-start', { detail: { i } })
+      this.container.dispatchEvent(ev)
+    }
+
     if (direction == 'next' && this.index < this.arrOrbits.length - 1) {
+      const i = this.index + 1
+      dispatch(i)
+
       this.animateCurve({
         floatIndex,
         curvesIndex: this.index,
-        orbitsIndex: this.index + 1,
+        orbitsIndex: i,
         onComplete: () => {
-          this.index++
+          this.index = i
         }
       })
 
@@ -592,12 +607,15 @@ export default class Slider {
     }
 
     if (direction == 'back' && this.index > 0) {
+      const i = this.index - 1
+      dispatch(i)
+
       this.animateCurve({
         floatIndex,
-        curvesIndex: this.index - 1,
-        orbitsIndex: this.index - 1,
+        curvesIndex: i,
+        orbitsIndex: i,
         onComplete: () => {
-          this.index--
+          this.index = i
         }
       })
 
@@ -655,12 +673,15 @@ export default class Slider {
     }
 
     if (direction == 'next' && this.index == this.arrOrbits.length - 1) {
+      const i = 0
+      dispatch(i)
+
       this.animateCurve({
         floatIndex,
         curvesIndex: this.index,
         orbitsIndex: 0,
         onComplete: () => {
-          this.index = 0
+          this.index = i
         }
       })
 
@@ -698,12 +719,15 @@ export default class Slider {
     }
 
     if (direction == 'back' && this.index == 0) {
+      const i = this.arrOrbits.length - 1
+      dispatch(i)
+
       this.animateCurve({
         floatIndex,
         curvesIndex: this.arrOrbits.length - 1,
         orbitsIndex: this.arrOrbits.length - 1,
         onComplete: () => {
-          this.index = this.arrOrbits.length - 1
+          this.index = i
         }
       })
 
@@ -741,5 +765,27 @@ export default class Slider {
         materialChanged = true
       }
     }
+  }
+
+  inMenu() {
+    this.moving = true
+
+    TweenMax.to(this.camera.rotation, 0.8, {
+      y: this.camera.rotation.y + Math.PI,
+      onComplete: () => {
+        this.moving = false
+      }
+    })
+  }
+
+  outMenu() {
+    this.moving = true
+
+    TweenMax.to(this.camera.rotation, 0.8, {
+      y: this.camera.rotation.y - Math.PI,
+      onComplete: () => {
+        this.moving = false
+      }
+    })
   }
 }

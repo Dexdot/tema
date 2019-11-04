@@ -6,17 +6,13 @@
       <nav class="menu__nav" @click="$emit('click')">
         <ul>
           <li>
-            <router-link class="menu__link" to="/">Cases</router-link>
+            <router-link class="menu__link" to="/about">About</router-link>
           </li>
           <li>
-            <router-link class="menu__link" to="/case/legenda"
-              >Legenda</router-link
-            >
+            <router-link class="menu__link" to="/">Work</router-link>
           </li>
           <li>
-            <router-link class="menu__link" to="/case/energotek"
-              >Energotek</router-link
-            >
+            <router-link class="menu__link" to="/contact">Contact</router-link>
           </li>
         </ul>
       </nav>

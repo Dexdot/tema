@@ -2,7 +2,7 @@ import anime from 'animejs'
 
 const enter = (ctx, cb) =>
   new Promise(resolve => {
-    ctx.$el.querySelector('#slider').classList.add('visible')
+    ctx.$el.querySelector('.slider-container').classList.add('visible')
 
     setTimeout(() => {
       // Unlock scroll
@@ -15,11 +15,11 @@ const enter = (ctx, cb) =>
 
 const leave = (ctx, cb) =>
   new Promise(resolve => {
-    anime.set('#slider', { transition: 'unset' })
+    anime.set('.slider-container', { transition: 'unset' })
 
     // Show canvas
     anime({
-      targets: '#slider',
+      targets: '.slider-container',
       opacity: 0,
       duration: 300,
       easing: 'easeInCubic',

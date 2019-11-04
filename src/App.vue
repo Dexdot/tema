@@ -3,7 +3,7 @@
     <Menu :active="isMenuActive" />
     <Main :isMenuActive="isMenuActive" @toggle-menu="toggleMenu" />
 
-    <div :class="['scroll', { hidden: isMenuActive }]">
+    <div :class="['scroll', { hidden: hideContent }]">
       <Scroll ref="scroll">
         <transition
           v-if="mounted"
@@ -13,10 +13,12 @@
           mode="out-in"
         >
           <router-view
+            ref="view"
             :key="$route.path"
             :scroll="$refs.scroll && $refs.scroll.scroll"
+            :detect="$refs.scroll && $refs.scroll.detect"
+            :isMenuActive="isMenuActive"
             @disable-scroll="disableScroll"
-            ref="view"
           />
         </transition>
       </Scroll>
@@ -43,6 +45,11 @@ export default {
     isMenuActive: false,
     dir: {}
   }),
+  computed: {
+    hideContent() {
+      return this.$route.name === 'index' ? false : this.isMenuActive
+    }
+  },
   mounted() {
     this.$nextTick(() => {
       this.mounted = true
@@ -56,9 +63,9 @@ export default {
     disableScroll(v) {
       this.$refs.scroll.scroll.disable = v
     },
-    toggleMenu() {
+    toggleMenu(transition = false) {
       this.isMenuActive = !this.isMenuActive
-      this.disableScroll(this.isMenuActive)
+      if (transition) this.disableScroll(this.isMenuActive)
     },
     resetScroll() {
       this.$refs.scroll.scroll.val = 0
@@ -84,11 +91,8 @@ export default {
       }
     },
     async leave(el, done) {
-      if (this.isMenuActive) {
-        this.toggleMenu()
-      } else {
-        this.disableScroll(true)
-      }
+      if (this.isMenuActive) this.toggleMenu(true)
+      this.disableScroll(true)
 
       const trs = this.dir.from.name
       await transitions[trs].leave(this.$refs.view)

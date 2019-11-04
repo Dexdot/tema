@@ -1,6 +1,11 @@
 <template>
   <div>
-    <Slider :scroll="scroll" @init="onSliderInit" />
+    <Slider
+      :scroll="scroll"
+      :detect="detect"
+      :isMenuActive="isMenuActive"
+      @init="onSliderInit"
+    />
   </div>
 </template>
 
@@ -8,7 +13,7 @@
 import Slider from '@/Slider'
 export default {
   name: 'Index',
-  props: ['scroll'],
+  props: ['scroll', 'detect', 'isMenuActive'],
   components: {
     Slider
   },

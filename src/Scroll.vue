@@ -51,7 +51,8 @@ export default {
       translate: 0,
       deltaY: 0,
       winHeight: 0,
-      counter: 0
+      counter: 0,
+      direction: 0
     },
     vs: null,
     detect: {}
@@ -136,9 +137,16 @@ export default {
       }
     },
     defaultScroll({ deltaY }) {
-      this.scroll.counter++
       this.scroll.deltaY = deltaY
+
+      if (window.pageYOffset > this.scroll.val) {
+        this.scroll.direction = 1
+      } else {
+        this.scroll.direction = -1
+      }
+
       this.scroll.val = window.pageYOffset
+      this.scroll.counter++
     }
   }
 }
