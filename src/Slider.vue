@@ -14,8 +14,6 @@
 </template>
 
 <script>
-import anime from 'animejs'
-
 import three from '@/gl/ThreeSlider'
 import Slider from '@/gl/Slider'
 import { getCases } from '@/scripts/api'
@@ -56,35 +54,20 @@ export default {
       three
     })
     container.addEventListener('init-complete', () => {
-      this.title = this.slider.sceneParams[this.slider.index].title
+      console.log('init-complete')
       this.$emit('init', this.slider)
     })
-    container.addEventListener('slide-start', this.onSlideStart.bind(this))
   },
   methods: {
-    onSlideStart({ detail }) {
-      const targets = this.$refs.title
-
-      anime({
-        targets,
-        duration: 600,
-        easing: 'easeInCubic',
-        translateY: '-100%',
-        complete: () => {
-          this.title = this.slider.sceneParams[detail.i].title
-          anime({
-            targets,
-            duration: 800,
-            easing: 'easeOutCubic',
-            translateY: ['100%', '0%']
-          })
-        }
-      })
-    },
     onClick() {
-      this.$router.push(
+      console.log(
+        'click',
         `/case/${this.slider.sceneParams[this.slider.index].slug}`
       )
+
+      // this.$router.push(
+      //   `/case/${this.slider.sceneParams[this.slider.index].slug}`
+      // )
     }
   },
   watch: {
@@ -95,28 +78,30 @@ export default {
       } else {
         dir = this.scroll.deltaY < 0 ? 'next' : 'back'
       }
-      this.slider.indexControl(dir)
-    },
-    isMenuActive(isActive) {
-      if (isActive) {
-        this.slider.inMenu()
-        anime({
-          targets: '.slider-title, .slider-counter',
-          duration: 300,
-          easing: 'easeInCubic',
-          opacity: 0
-        })
-      } else {
-        this.slider.outMenu()
-        anime({
-          targets: '.slider-title, .slider-counter',
-          duration: 300,
-          delay: 300,
-          easing: 'easeOutCubic',
-          opacity: 1
-        })
-      }
+      console.log('dir: ' + dir)
+
+      // this.slider.indexControl(dir)
     }
+    // isMenuActive(isActive) {
+    //   if (isActive) {
+    //     this.slider.inMenu()
+    //     anime({
+    //       targets: '.slider-title, .slider-counter',
+    //       duration: 300,
+    //       easing: 'easeInCubic',
+    //       opacity: 0
+    //     })
+    //   } else {
+    //     this.slider.outMenu()
+    //     anime({
+    //       targets: '.slider-title, .slider-counter',
+    //       duration: 300,
+    //       delay: 300,
+    //       easing: 'easeOutCubic',
+    //       opacity: 1
+    //     })
+    //   }
+    // }
   }
 }
 </script>
@@ -132,35 +117,11 @@ export default {
   width: 100vw
   height: 100vh
 
-.slider-container
-  opacity: 0
-  transition: opacity 0.6s ease-out
-  &.visible
-    opacity: 1
-
-// Title
-.slider-title
-  +wood(r)
-  +yo('font-size', (320px: 40px, 1300px: 80px, 1920px: 124px, 2550px: 156px))
-  line-height: 1.2
-  letter-spacing: -0.01em
-
-  position: fixed
-  top: 50vh
-  left: 50%
-  transform: translate(-50%, -50%)
-
-  white-space: nowrap
-  overflow: hidden
-
-  span
-    display: inline-block
-    will-change: transform
-
-body.is-safari,
-body.is-mob
-  .slider-title
-    top: 50%
+// .slider-container
+//   opacity: 0
+//   transition: opacity 0.6s ease-out
+//   &.visible
+//     opacity: 1
 
 // Counter
 .slider-counter

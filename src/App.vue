@@ -3,7 +3,8 @@
     <Menu :active="isMenuActive" />
     <Main :isMenuActive="isMenuActive" @toggle-menu="toggleMenu" />
 
-    <div :class="['scroll', { hidden: hideContent }]">
+    <!-- <div :class="['scroll', { hidden: hideContent }]"> -->
+    <div class="scroll">
       <Scroll ref="scroll">
         <transition
           v-if="mounted"
@@ -73,23 +74,29 @@ export default {
       window.scrollTo(0, 0)
     },
     async enter(el, done) {
-      const asyncPages = ['index', 'case']
       const trs = this.dir.to.name
-
-      const go = async () => {
-        await transitions[trs].enter(this.$refs.view)
-        done()
-        this.disableScroll(false)
-      }
-
-      if (asyncPages.includes(trs)) {
-        el.addEventListener('init-complete', () => {
-          go()
-        })
-      } else {
-        go()
-      }
+      await transitions[trs].enter(this.$refs.view)
+      done()
+      this.disableScroll(false)
     },
+    // async enter(el, done) {
+    //   const asyncPages = ['index', 'case']
+    //   const trs = this.dir.to.name
+
+    //   const go = async () => {
+    //     await transitions[trs].enter(this.$refs.view)
+    //     done()
+    //     this.disableScroll(false)
+    //   }
+
+    //   if (asyncPages.includes(trs)) {
+    //     el.addEventListener('init-complete', () => {
+    //       go()
+    //     })
+    //   } else {
+    //     go()
+    //   }
+    // },
     async leave(el, done) {
       if (this.isMenuActive) this.toggleMenu(true)
       this.disableScroll(true)
@@ -133,10 +140,10 @@ body.is-mob
 </style>
 
 <style lang="sass" scoped>
-.scroll
-  transition: opacity 0.25s ease
-  &.hidden
-    opacity: 0
-    pointer-events: none
-    user-select: none
+// .scroll
+//   transition: opacity 0.25s ease
+//   &.hidden
+//     opacity: 0
+//     pointer-events: none
+//     user-select: none
 </style>

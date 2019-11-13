@@ -37,52 +37,52 @@
 </template>
 
 <script>
-import Next from '@/Next'
-import Inside from '@/Inside'
-import { getCase } from '@/scripts/api'
+import Next from "@/Next";
+import Inside from "@/Inside";
+import { getCase } from "@/scripts/api";
 
 export default {
-  name: 'Case',
+  name: "Case",
   components: {
     Inside,
     Next
   },
-  props: ['scroll'],
+  props: ["scroll"],
   data: () => ({
     content: {},
     scene: null
   }),
   async created() {
-    this.content = await getCase(this, this.$route.params.id)
+    this.content = await getCase(this, this.$route.params.id);
     this.$nextTick(() => {
-      this.observe()
-    })
+      this.observe();
+    });
   },
   methods: {
     onSceneInit(scene) {
-      this.scene = scene
-      this.$el.dispatchEvent(new Event('init-complete'))
+      this.scene = scene;
+      this.$el.dispatchEvent(new Event("init-complete"));
     },
     observe() {
       const observer = new IntersectionObserver(
         entries => {
           entries.forEach(({ target, isIntersecting }) => {
             if (isIntersecting) {
-              target.classList.add('visible')
+              target.classList.add("visible");
             } else {
-              target.classList.remove('visible')
+              target.classList.remove("visible");
             }
-          })
+          });
         },
         { threshold: [0, 0.5, 1] }
-      )
+      );
 
       this.$refs.images.forEach(img => {
-        observer.observe(img)
-      })
+        observer.observe(img);
+      });
     }
   }
-}
+};
 </script>
 
 <style lang="sass" scoped>

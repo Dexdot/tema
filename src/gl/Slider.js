@@ -8,10 +8,11 @@ export default class Slider {
     const { selector, images, three } = props
     THREE = three
     this.images = images
+    this.selector = selector
 
-    // this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(
-    //   navigator.userAgent
-    // )
+    this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(
+      navigator.userAgent
+    )
 
     // Scene
     this.scene = new THREE.Scene()
@@ -19,38 +20,205 @@ export default class Slider {
       95,
       window.innerWidth / window.innerHeight,
       0.1,
-      60000
-      // this.isMobile ? 750 : 60000
+      this.isMobile ? 10000 : 6000
     )
-    this.scene.background = new THREE.Color(0x000000)
+    this.insideCamera = new THREE.PerspectiveCamera(
+      this.isMobile ? 95 : 75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      10000
+    )
+
+    this.scene.background = new THREE.Color(0x020202)
 
     // Renderer
     this.renderer = new THREE.WebGLRenderer({ antialias: true })
     this.renderer.shadowMap.enabled = true
     this.renderer.setSize(window.innerWidth, window.innerHeight)
-    this.focus = new THREE.Vector3(2999, 1000, 23876)
 
-    // Options
-    this.container = document.querySelector(selector)
-    this.time = 18.95
+    this.fShader = THREE.FresnelShader
+    this.font = null
+
+    this.about = null
+    this.works = null
+    this.contact = null
+    this.tCubes = []
+
+    // Scene params
+    this.sceneParams = {
+      // VK
+      0: {
+        slug: 'vk',
+        name: 'VK',
+        uniformsOut: {
+          cubeMap: this.images['vk']
+        }
+      },
+      // AIR ENERGY
+      1: {
+        slug: 'air-energy',
+        name: 'Air Energy',
+        uniformsOut: {
+          cubeMap: this.images['air-energy']
+        }
+      },
+      // LEGENDA
+      2: {
+        slug: 'legenda',
+        name: 'Legenda',
+        uniformsOut: {
+          cubeMap: this.images['legenda']
+        }
+      },
+      // TWP
+      3: {
+        slug: 'twp',
+        name: 'TWP',
+        uniformsOut: {
+          cubeMap: this.images['twp']
+        }
+      },
+      // ENERGOTEK
+      4: {
+        slug: 'energotek',
+        name: 'Energotek',
+        uniformsOut: {
+          cubeMap: this.images['energotek']
+        }
+      },
+      // CHE Group
+      5: {
+        slug: 'che-group',
+        name: 'Che Group',
+        uniformsOut: {
+          cubeMap: this.images['che-group']
+        }
+      },
+      // NEUROHIVE
+      6: {
+        slug: 'neurohive',
+        name: 'Neurohive',
+        uniformsOut: {
+          cubeMap: this.images['neurohive']
+        }
+      }
+    }
+
+    this.loadResources()
+  }
+
+  loadResources() {
+    let resCounter = 0
+
+    for (let i in this.sceneParams) {
+      let url = this.sceneParams[i].uniformsOut.cubeMap
+
+      this.sceneParams[
+        i
+      ].uniformsOut.tCube = new THREE.CubeTextureLoader().load(
+        Array(6).fill(url),
+        () => {
+          resCounter++
+        }
+      )
+    }
+    let oceanMaterial = new THREE.ShaderMaterial({
+      uniforms: THREE.OceanShader.uniforms,
+      vertexShader: THREE.OceanShader.vertexShader,
+      fragmentShader: THREE.OceanShader.fragmentShader,
+      side: THREE.DoubleSide,
+      transparent: true
+    })
+
+    const fontJson = require('@/assets/Wooland.json')
+
+    const font = new THREE.Font(fontJson)
+
+    // let fontLoader = new THREE.FontLoader()
+
+    // fontLoader.load("@/assets/Wooland.json", font => {
+    this.font = font
+
+    const getFontGeometry = (text, size = 150) => {
+      return new THREE.TextBufferGeometry(text, {
+        font,
+        size,
+        height: 1,
+        curveSegments: 12,
+        bevelEnabled: false,
+        bevelThickness: 10,
+        bevelSize: 8,
+        bevelOffset: 0,
+        bevelSegments: 5
+      })
+    }
+
+    // About
+    this.about = new THREE.Mesh(getFontGeometry('About'), oceanMaterial.clone())
+    this.about.name = 'about'
+
+    // Works
+    this.works = new THREE.Mesh(getFontGeometry('Works'), oceanMaterial.clone())
+    this.works.name = 'works'
+
+    // Contact
+    this.contact = new THREE.Mesh(
+      getFontGeometry('Contact'),
+      oceanMaterial.clone()
+    )
+    this.contact.name = 'contact'
+
+    // Neurohive
+    this.oceanText = new THREE.Mesh(
+      getFontGeometry('Neurohive', 30),
+      oceanMaterial
+    )
+    this.oceanText.animating = false
+    this.menuTime = { about: 0, works: 0, contact: 0 }
+
+    resCounter++
+    // });
+
+    let interval
+    interval = setInterval(() => {
+      if (resCounter == 8) {
+        clearInterval(interval)
+        this.init()
+      }
+    }, 100)
+  }
+
+  init() {
+    this.focus = new THREE.Vector3(0, 0, 0)
+    this.time = 17
     this.index = 3
     this.spheres = []
     this.moving = false
     this.last = null
 
-    // Settings
+    this.oldTime = 0
+    this.newTime = 0
+    this.isTouchPad
+    this.eventCount = 0
+    this.eventCountStart
+
+    this.TGroup = new THREE.Group()
+    this.fovard = 0.001
+    this.insideSphere = null
+    this.target = new THREE.Vector3(350, 20, 0)
+
     this.settings = {
       reflectivity: 0.5,
       metalness: 0.5,
       progress: 1,
       animtime: 5,
       roughness: 0.5,
-      uWiggleScale: 0.14,
+      uWiggleScale: 0.241,
       uWiggleDisplacement: 10.995,
-      uWiggleSpeed: 0.001,
+      uWiggleSpeed: 0.125,
       refractionRatio: 0.93,
       dispersionSamples: 30,
-      dispersionBlendMultiplier: 6,
+      dispersionBlendMultiplier: 3,
       dispersion: 0.8,
       mRefractionRatio: 1.0,
       mFresnelBias: 1,
@@ -59,92 +227,22 @@ export default class Slider {
       bgcolor: '#' + this.scene.background.getHexString()
     }
 
-    // Scene params
-    this.sceneParams = {
-      // VK
-      0: {
-        slug: 'vk',
-        title: 'VK',
-        x: -17204,
-        y: 1000,
-        z: 23876,
-        uniformsOut: {
-          cubeMap: this.images['vk']
-        }
-      },
-      // AIR ENERGY
-      1: {
-        slug: 'air-energy',
-        title: 'Air Energy',
-        x: -7776,
-        y: 4346,
-        z: 11754,
-        uniformsOut: {
-          cubeMap: this.images['air-energy']
-        }
-      },
-      // LEGENDA
-      2: {
-        slug: 'legenda',
-        title: 'Legenda',
-        x: 305,
-        y: -1715,
-        z: 2999,
-        uniformsOut: {
-          cubeMap: this.images['legenda']
-        }
-      },
-      // TWP
-      3: {
-        slug: 'twp',
-        title: 'TWP',
-        x: 2999,
-        y: -400,
-        z: 0,
-        uniformsOut: {
-          cubeMap: this.images['twp']
-        }
-      },
-      // ENERGOTEK
-      4: {
-        slug: 'energotek',
-        title: 'Energotek',
-        x: 305,
-        y: 1652,
-        z: -2600,
-        uniformsOut: {
-          cubeMap: this.images['energotek']
-        }
-      },
-      // CHE Group
-      5: {
-        slug: 'che-group',
-        title: 'Che Group',
-        x: -4009,
-        y: -3062,
-        z: -7776,
-        uniformsOut: {
-          cubeMap: this.images['che-group']
-        }
-      },
-      // NEUROHIVE
-      6: {
-        slug: 'neurohive',
-        title: 'Neurohive',
-        x: -7776,
-        y: 1600,
-        z: -16531,
-        uniformsOut: {
-          cubeMap: this.images['neurohive']
-        }
-      }
-    }
-
     this.arrB = []
     this.arrCurves = []
     this.arrOrbits = []
 
-    // Append renderer into container
+    this.fontSettings = {
+      size: 80,
+      height: 5,
+      curveSegments: 12,
+      bevelEnabled: false,
+      bevelThickness: 10,
+      bevelSize: 8,
+      bevelOffset: 0,
+      bevelSegments: 5
+    }
+
+    this.container = document.querySelector(this.selector)
     this.container.appendChild(this.renderer.domElement)
 
     this.rtParameters = {
@@ -154,50 +252,26 @@ export default class Slider {
       stencilBuffer: true
     }
 
-    this.filmParams = {
-      noiseIntensity: 0.35,
-      scanlinesIntensity: 0.025,
-      scanlinesCount: 648,
-      grayscale: false
+    this.caseParams = {
+      frequency1: 0.035,
+      amplitude1: 20.0,
+      frequency2: 0.025,
+      amplitude2: 70.0
     }
-
-    this.composerScene = new THREE.EffectComposer(
-      this.renderer,
-      new THREE.WebGLRenderTarget(
-        window.innerWidth * 2,
-        window.innerHeight * 2,
-        this.rtParameters
-      )
-    )
-
-    this.effectFilm = new THREE.FilmPass(
-      this.filmParams.noiseIntensity,
-      this.filmParams.scanlinesIntensity,
-      this.filmParams.scanlinesCount,
-      this.filmParams.grayscale
-    )
-
-    this.renderPass = new THREE.RenderPass(this.scene, this.camera)
-    this.composerScene.addPass(this.renderPass)
-    this.composerScene.addPass(this.effectFilm)
 
     this.raycaster = new THREE.Raycaster()
 
     this.mouse = new THREE.Vector2()
 
-    // Add event listeners
     this.initEvents()
 
-    this.fShader = THREE.FresnelShader
-
-    // Camera position
-    // this.camera.position.z = 1642
-    // this.camera.position.set(7277, 634, 27)
     this.camera.lookAt(this.scene.position)
+    this.textPositions = []
+
+    this.inMenu = false
 
     this.bigtestgeometry = new THREE.IcosahedronGeometry(500, 4)
 
-    // MESH
     for (let i = 0; i < 7; i++) {
       let meshBMaterial = new THREE.ShaderMaterial({
         defines: {
@@ -210,39 +284,22 @@ export default class Slider {
           mFresnelScale: { type: 'f', value: 1.0 },
           time: { type: 'f', value: 9.95 },
           progress: { type: 'f', value: 1.0 },
-          uWiggleScale: { type: 'f', value: 0.14 },
+          uWiggleScale: { type: 'f', value: 0.241 },
           uWiggleDisplacement: { type: 'f', value: 0.01 },
-          uWiggleSpeed: { type: 'f', value: 0.001 },
+          uWiggleSpeed: { type: 'f', value: 0.125 },
           refractionRatio: { type: 'f', value: 0.93 },
           dispersion: { type: 'f', value: 0.8 },
-          dispersionBlendMultiplier: { type: 'f', value: 6.0 },
+          dispersionBlendMultiplier: { type: 'f', value: 3.0 },
           cameraPosition: { value: this.camera.position },
           tCube: {
             type: 't',
-            value: new THREE.CubeTextureLoader().load(
-              [
-                this.sceneParams[i].uniformsOut.cubeMap,
-                this.sceneParams[i].uniformsOut.cubeMap,
-                this.sceneParams[i].uniformsOut.cubeMap,
-                this.sceneParams[i].uniformsOut.cubeMap,
-                this.sceneParams[i].uniformsOut.cubeMap,
-                this.sceneParams[i].uniformsOut.cubeMap
-              ],
-              () => {
-                if (i === 6) {
-                  this.container.dispatchEvent(new Event('init-complete'))
-                }
-              }
-            )
+            value: this.sceneParams[i].uniformsOut.tCube
           }
         },
         vertexShader: this.fShader.vertexShader,
         fragmentShader: this.fShader.fragmentShader
       })
-
       let meshB = new THREE.Mesh(this.bigtestgeometry, meshBMaterial)
-      meshBMaterial.maxScaleHover =
-        meshBMaterial.uniforms.uWiggleScale.value + 0.075
 
       let x = Math.cos((2 * Math.PI * i) / 7) * 6000 + 0
       let y = Math.sin((2 * Math.PI * i) / 7) * 6000 + 0
@@ -263,6 +320,14 @@ export default class Slider {
         Math.sin((2 * Math.PI * (i + 0.1)) / 7) * 7100 + 0
       )
 
+      this.textPositions.push(
+        new THREE.Vector3(
+          Math.cos((2 * Math.PI * i) / 7) * 8000,
+          meshB.position.y + 300,
+          Math.sin((2 * Math.PI * i) / 7) * 8000
+        )
+      )
+
       let LCurveControlVector = new THREE.Vector3(
         Math.cos((2 * Math.PI * (i + 0.5)) / 7) * 10000 + 0,
         meshB.position.y + 300,
@@ -278,7 +343,7 @@ export default class Slider {
       )
 
       this.arrCurves.push(LCurveControlVector)
-
+      meshB.name = i + ''
       meshB.position.set(x, 300, y)
       meshB.lookAt(this.scene.position)
 
@@ -286,6 +351,26 @@ export default class Slider {
 
       this.scene.add(meshB)
     }
+
+    this.material = new THREE.ShaderMaterial({
+      extensions: {
+        derivatives: '#extension GL_OES_standard_derivatives : enable'
+      },
+      defines: THREE.DispersionMaterial.defines,
+      uniforms: THREE.DispersionMaterial.uniforms,
+      side: THREE.DoubleSide,
+      vertexShader: THREE.DispersionMaterial.vertex_Shader,
+
+      fragmentShader: THREE.DispersionMaterial.fragmentShader
+    })
+    this.insideSphere = new THREE.Mesh(this.bigtestgeometry, this.material)
+    this.insideSphere.visible = false
+    this.insideSphere.name = 'inside'
+    this.scene.add(this.insideSphere)
+
+    this.recompileShader(this.arrB[this.index], 50)
+    this.recompileShader(this.arrB[this.index + 1], 20)
+    this.recompileShader(this.arrB[this.index - 1], 20)
 
     for (let i = 0; i < 7; i++) {
       this.arrB[
@@ -325,13 +410,97 @@ export default class Slider {
       this.camera.position.y,
       this.camera.position.z
     )
+
     this.scene.add(this.light)
+
     this.camera.position.set(
       this.arrOrbits[this.index].getPointAt(0.5).x,
       this.arrOrbits[this.index].getPointAt(0.5).y,
       this.arrOrbits[this.index].getPointAt(0.5).z
     )
+
     this.camera.lookAt(this.scene.position)
+
+    // About TGroup
+    this.TGroup.add(this.about)
+    this.about.position.x = -1200
+    this.about.position.y = 150
+
+    // Works TGroup
+    this.TGroup.add(this.works)
+    this.works.position.x = -1200
+    this.works.position.y = -100
+
+    // Contact TGroup
+    this.TGroup.add(this.contact)
+    this.contact.position.x = -1200
+    this.contact.position.y = -350
+
+    // About plane
+    let aboutPlane = new THREE.Mesh(
+      new THREE.PlaneGeometry(650, 120),
+      new THREE.MeshBasicMaterial({ color: 0x020202 })
+    )
+    aboutPlane.name = 'about'
+    aboutPlane.position.x = -870
+    aboutPlane.position.y = 200
+    this.TGroup.add(aboutPlane)
+
+    // Works plane
+    let worksPlane = new THREE.Mesh(
+      new THREE.PlaneGeometry(760, 120),
+      new THREE.MeshBasicMaterial({ color: 0x020202 })
+    )
+    worksPlane.name = 'works'
+    worksPlane.position.x = -800
+    worksPlane.position.y = -55
+    this.TGroup.add(worksPlane)
+
+    // Contact plane
+    let contactPlane = new THREE.Mesh(
+      new THREE.PlaneGeometry(790, 120),
+      new THREE.MeshBasicMaterial({ color: 0x020202 })
+    )
+    contactPlane.name = 'contact'
+    contactPlane.position.x = -800
+    contactPlane.position.y = -300
+    this.TGroup.add(contactPlane)
+
+    this.scene.add(this.TGroup)
+
+    this.Cgroup = new THREE.Group()
+
+    this.Cgroup.add(this.oceanText)
+    this.oceanText.position.x = -100
+    this.oceanText.position.y = 0
+    this.scene.add(this.Cgroup)
+    this.distanceScale = 0.96
+    this.Cgroup.position.set(
+      this.camera.position.x * this.distanceScale,
+      300,
+      this.camera.position.z * this.distanceScale
+    )
+
+    this.generateGeometry(this.index)
+
+    let newPos = new THREE.Vector3(
+      this.camera.position.x,
+      this.camera.position.y,
+      this.camera.position.z
+    )
+    newPos.x *= 1.01
+    newPos.z *= 1.01
+    this.TGroup.position.set(newPos.x, 500, newPos.z)
+    this.TGroup.visible = false
+
+    for (let i = 0; i < this.arrB.length; i++) {
+      this.arrB[i].material.uniforms.dispersionBlendMultiplier.value = 1
+    }
+    this.arrB[3].material.uniforms.dispersionBlendMultiplier.value = 4 //face sphere
+    this.arrB[2].material.uniforms.dispersionBlendMultiplier.value = 1.5
+    this.arrB[4].material.uniforms.dispersionBlendMultiplier.value = 1.5
+
+    this.container.dispatchEvent(new Event('init-complete'))
 
     this.start()
   }
@@ -346,45 +515,74 @@ export default class Slider {
     )
   }
 
-  onWindowResize() {
-    this.camera.aspect = window.innerWidth / window.innerHeight
-    this.camera.updateProjectionMatrix()
+  generateGeometry(futureIndex) {
+    let newGeometry = new THREE.TextBufferGeometry(
+      this.sceneParams[futureIndex].name,
+      {
+        font: this.font,
+        size: 40,
+        height: 0,
+        curveSegments: 12,
+        bevelEnabled: false,
+        bevelThickness: 10,
+        bevelSize: 8,
+        bevelOffset: 0,
+        bevelSegments: 5
+      }
+    )
+    newGeometry.word = this.sceneParams[futureIndex].name
+    let tmpMaterial = this.oceanText.material
+    this.Cgroup.remove(this.oceanText)
+    this.oceanText = new THREE.Mesh(newGeometry, tmpMaterial)
+    this.Cgroup.add(this.oceanText)
+    this.oceanText.position.x = ((newGeometry.word.length * 30) / 2) * -1
+    this.oceanText.position.y = 0
+  }
 
-    this.container.width = window.innerWidth
-    this.container.height = window.innerHeight
+  recompileShader(Sobject, priority) {
+    let tempUniforms = Sobject.material.uniforms
 
-    this.renderer.setPixelRatio(window.devicePixelRatio)
-    this.renderer.setSize(window.innerWidth, window.innerHeight)
+    let tmpMaterial = new THREE.ShaderMaterial({
+      defines: {
+        DISPERSION_SAMPLES: priority
+      },
+      uniforms: tempUniforms,
+      vertexShader: this.fShader.vertexShader,
+      fragmentShader: this.fShader.fragmentShader
+    })
+    Sobject.material = tmpMaterial
   }
 
   animate() {
-    this.time += 0.001
+    if (!this.insideSphere.visible) {
+      this.time += this.fovard
+      ;['about', 'works', 'contact'].forEach(key => {
+        if (!this.menuTime[key]) this[key].material.uniforms.time.value += 0.025
+      })
+
+      if (this.time > 24.5 || this.time < 17) {
+        this.fovard *= -1
+      }
+
+      this.camera.lookAt(this.focus)
+      this.renderer.render(this.scene, this.camera)
+    } else {
+      this.insideCamera.lookAt(this.target)
+      this.insideSphere.material.uniforms.time.value = this.time
+      this.renderer.render(this.scene, this.insideCamera)
+    }
 
     for (let i = 0; i < 7; i++) {
       this.arrB[i].material.uniforms.time.value = this.time
-      this.arrB[i].rotation.x += 0.001
     }
 
-    this.composerScene.render(0.01)
-  }
+    this.TGroup.lookAt(this.camera.position)
 
-  start() {
-    loop.add(this.animate.bind(this), 'slider')
-  }
+    if (!this.oceanText.animating) {
+      this.oceanText.material.uniforms.time.value += Math.abs(this.fovard * 10)
+    }
 
-  pause() {
-    loop.remove('slider', true)
-  }
-
-  destroy() {
-    this.pause()
-
-    // Remove listeners
-    window.removeEventListener('resize', this.onWindowResize)
-    this.container.removeEventListener('mousemove', this.onMouseMove)
-
-    // Remove container and canvas
-    this.container.remove()
+    this.Cgroup.lookAt(this.camera.position)
   }
 
   onMouseMove(e) {
@@ -393,16 +591,24 @@ export default class Slider {
 
     this.raycaster.setFromCamera(this.mouse, this.camera)
 
-    if (!this.moving) {
+    if (!this.moving && !this.inMenu && !this.insideSphere.visible) {
       TweenMax.to(this.camera.position, 1, {
         ease: Power2.easeOut,
-        x: this.arrOrbits[this.index].getPointAt(0.5 + this.mouse.x * 0.1).x,
-        z: this.arrOrbits[this.index].getPointAt(0.5 + this.mouse.x * 0.1).z,
-        y: this.arrOrbits[this.index].getPointAt(0.5 + this.mouse.x * 0.1).y,
+        x: this.arrOrbits[this.index].getPointAt(0.5 + this.mouse.x * 0.3).x,
+        z: this.arrOrbits[this.index].getPointAt(0.5 + this.mouse.x * 0.3).z,
+        y: this.arrOrbits[this.index].getPointAt(0.5 + this.mouse.x * 0.3).y,
         onUpdate: () => {
           this.camera.lookAt(this.scene.position)
         }
       })
+    }
+
+    if (!this.moving && this.insideSphere.visible) {
+      this.insideCamera.position.z +=
+        (this.mouse.x * 4 - this.insideCamera.position.z) * 1.1
+      this.insideCamera.position.y +=
+        (-this.mouse.y + 20 - this.insideCamera.position.y) * 1.1
+      this.insideCamera.lookAt(this.target)
     }
 
     // Calculate objects intersecting the picking ray
@@ -410,50 +616,37 @@ export default class Slider {
 
     if (intersects.length == 0) {
       if (this.last != null) {
-        TweenMax.to(this.last.uniforms.dispersion, 2, {
+        TweenMax.to(this.last.material.uniforms.dispersion, 2, {
           value: 0.8,
           ease: Power2.easeOut
         })
 
-        TweenMax.to(this.last.uniforms.refractionRatio, 2, {
+        TweenMax.to(this.last.material.uniforms.refractionRatio, 2, {
           value: 0.93,
           ease: Power2.easeOut
-        })
-
-        const tmpConst = this.last.maxScaleHover - 0.075
-
-        TweenMax.to(this.last.uniforms.uWiggleScale, 2, {
-          value: tmpConst,
-          ease: Power2.easeInOut
         })
 
         this.last = null
       }
     }
 
-    if (intersects.length > 0 && intersects[0].object.name != 'text') {
+    if (intersects.length > 0) {
       if (
         this.last != null &&
-        this.last.uuid != intersects[0].object.material.uuid
+        this.last.material.uuid != intersects[0].object.material.uuid &&
+        intersects[0].object.name != 'inside'
       ) {
-        TweenMax.to(this.last.uniforms.dispersion, 2, {
+        TweenMax.to(this.last.material.uniforms.dispersion, 2, {
           value: 0.8,
           ease: Power2.easeInOut
         })
 
-        TweenMax.to(this.last.uniforms.refractionRatio, 2, {
+        TweenMax.to(this.last.material.uniforms.refractionRatio, 2, {
           value: 0.93,
           ease: Power2.easeOut
         })
 
-        const tmpConstP = this.last.maxScaleHover - 0.075
-
-        TweenMax.to(this.last.uniforms.uWiggleScale, 2, {
-          value: tmpConstP,
-          ease: Power2.easeInOut,
-          onComplete: () => {}
-        })
-        this.last = intersects[0].object.material
+        this.last = intersects[0].object
 
         TweenMax.to(intersects[0].object.material.uniforms.dispersion, 2, {
           value: 1,
@@ -463,35 +656,139 @@ export default class Slider {
         TweenMax.to(intersects[0].object.material.uniforms.refractionRatio, 2, {
           value: 1,
           ease: Power2.easeOut
-        })
-
-        const tmpConstM = intersects[0].object.material.maxScaleHover
-
-        TweenMax.to(intersects[0].object.material.uniforms.uWiggleScale, 2, {
-          value: tmpConstM,
-          ease: Power2.easeInOut
         })
       }
 
-      if (this.last == null) {
-        this.last = intersects[0].object.material
+      if (this.last == null && intersects[0].object.name != 'inside') {
+        this.last = intersects[0].object
 
-        TweenMax.to(intersects[0].object.material.uniforms.dispersion, 2, {
+        TweenMax.to(this.last.material.uniforms.dispersion, 2, {
           value: 1,
           ease: Power2.easeInOut
         })
 
-        TweenMax.to(intersects[0].object.material.uniforms.refractionRatio, 2, {
+        TweenMax.to(this.last.material.uniforms.refractionRatio, 2, {
           value: 1,
           ease: Power2.easeOut
         })
+      }
 
-        TweenMax.to(intersects[0].object.material.uniforms.uWiggleScale, 2, {
-          value: intersects[0].object.material.maxScaleHover,
-          ease: Power2.easeInOut
+      if (parseInt(intersects[0].object.name, 10) == this.index) {
+        this.oceanText.animating = true
+
+        TweenMax.to(this.oceanText.material.uniforms.time, 1, {
+          value: this.oceanText.material.uniforms.time.value + Math.PI,
+          onComplete: () => {
+            this.oceanText.animating = false
+          }
         })
       }
     }
+
+    intersects = this.raycaster.intersectObjects(this.TGroup.children)
+
+    if (intersects.length > 0) {
+      const { name } = intersects[0].object
+
+      this.menuTime[name] = 1
+      this.fill(new THREE.Color(0xffffff), 1, this[name])
+      TweenMax.to(this[name].material.uniforms.time, 1, {
+        value: this[name].material.uniforms.time.value + Math.PI,
+        onComplete: () => {
+          this.menuTime[name] = 0
+        }
+      })
+    }
+  }
+
+  in() {
+    this.moving = true
+
+    TweenMax.killAll(false, true, false)
+    TweenMax.to(this.container.style, 1.5, { opacity: 1 })
+    TweenMax.to(this.camera.position, 1.5, {
+      x: this.arrB[this.index].position.x * 1.1,
+      y: this.arrB[this.index].position.y,
+      z: this.arrB[this.index].position.z * 1.1,
+      onComplete: () => {
+        this.enter()
+      }
+    })
+  }
+
+  out() {
+    this.moving = true
+    TweenMax.to(this, 1.5, { time: 9.95 })
+
+    TweenMax.to(this.insideCamera.position, 1.5, {
+      x: -396.2
+    })
+
+    TweenMax.to(this.container.style, 1.5, {
+      opacity: 1,
+      onComplete: () => {
+        this.back()
+      }
+    })
+  }
+
+  enter() {
+    this.moving = true
+
+    this.insideSphere.material.uniforms.envMap.value = this.arrB[
+      this.index
+    ].material.uniforms.tCube.value
+    this.sceneVisibleControl(false)
+    this.camera.position.z = 0
+    this.insideSphere.visible = true
+    this.time = 9.95
+
+    TweenMax.to(this.container.style, 1.5, {
+      opacity: 0,
+      onComplete: () => {
+        this.camera.fov = 75
+      }
+    })
+
+    TweenMax.to(this, 5, { time: 10.32 })
+    this.insideCamera.position.set(-396.2, 20, 0)
+    TweenMax.to(this.insideCamera.position, 3, {
+      x: 4,
+      onComplete: () => {
+        this.moving = false
+      }
+    })
+  }
+
+  back() {
+    this.moving = true
+
+    this.time = 17
+
+    this.camera.fov = 95
+    this.sceneVisibleControl(true)
+    this.TGroup.visible = false
+    this.insideSphere.visible = false
+    this.camera.position.set(
+      this.arrB[this.index].position.x * 1.1,
+      this.arrB[this.index].position.y,
+      this.arrB[this.index].position.z * 1.1
+    )
+    TweenMax.to(this.camera.position, 1.5, {
+      ease: Power2.easeOut,
+      x: this.arrOrbits[this.index].getPointAt(0.5 + this.mouse.x * 0.1).x,
+      z: this.arrOrbits[this.index].getPointAt(0.5 + this.mouse.x * 0.1).z,
+      y: this.arrOrbits[this.index].getPointAt(0.5 + this.mouse.x * 0.1).y,
+      onUpdate: () => {
+        this.camera.lookAt(this.scene.position)
+      },
+      onComplete: () => {
+        this.moving = false
+      }
+    })
+    TweenMax.to(this.container.style, 1.5, {
+      opacity: 0
+    })
   }
 
   animateCurve({ curvesIndex, orbitsIndex, floatIndex, onComplete }) {
@@ -511,12 +808,28 @@ export default class Slider {
       )
     )
 
+    TweenMax.to(this.oceanText.material.uniforms.opacity, 0.5, {
+      value: 0,
+      onComplete: () => {
+        this.generateGeometry(orbitsIndex)
+      }
+    })
+
     TweenMax.to(floatIndex, 2, {
       ease: Power2.easeInOut,
       value: 1,
       onComplete: () => {
         onComplete()
         this.moving = false
+
+        this.Cgroup.position.set(
+          this.camera.position.x * this.distanceScale,
+          300,
+          this.camera.position.z * this.distanceScale
+        )
+        TweenMax.to(this.oceanText.material.uniforms.opacity, 0.5, {
+          value: 1
+        })
       },
       onUpdate: () => {
         this.camera.lookAt(this.scene.position)
@@ -531,19 +844,13 @@ export default class Slider {
   }
 
   indexControl(direction) {
-    if (this.moving) return false
+    if (this.inMenu && this.moving && this.insideSphere.visible) return false
 
     let floatIndex = { value: 0 }
     let materialChanged = false
 
-    const dispatch = i => {
-      const ev = new CustomEvent('slide-start', { detail: { i } })
-      this.container.dispatchEvent(ev)
-    }
-
     if (direction == 'next' && this.index < this.arrOrbits.length - 1) {
       const i = this.index + 1
-      dispatch(i)
 
       this.animateCurve({
         floatIndex,
@@ -557,48 +864,54 @@ export default class Slider {
       if (!materialChanged) {
         for (let i = 0; i < this.arrB.length; i++) {
           if (i != this.index + 1 && i != this.index + 2 && i != this.index) {
+            this.recompileShader(this.arrB[i], 20)
             TweenMax.to(
               this.arrB[i].material.uniforms.dispersionBlendMultiplier,
               1,
               { value: 1 }
-            )
+            ) // background spheres
           }
         }
-
         if (this.index == this.arrB.length - 2) {
+          this.recompileShader(this.arrB[this.index + 1], 50)
+          this.recompileShader(this.arrB[0], 30)
+          this.recompileShader(this.arrB[this.index], 30)
           TweenMax.to(
             this.arrB[this.index + 1].material.uniforms
               .dispersionBlendMultiplier,
             1,
-            { value: 6 }
-          )
+            { value: 4 }
+          ) //face sphere
           TweenMax.to(
             this.arrB[0].material.uniforms.dispersionBlendMultiplier,
             1,
-            { value: 4 }
+            { value: 1.5 }
           )
           TweenMax.to(
             this.arrB[this.index].material.uniforms.dispersionBlendMultiplier,
             1,
-            { value: 4 }
+            { value: 1.5 }
           )
         } else {
+          this.recompileShader(this.arrB[this.index + 1], 50)
+          this.recompileShader(this.arrB[this.index + 2], 30)
+          this.recompileShader(this.arrB[this.index], 30)
           TweenMax.to(
             this.arrB[this.index + 1].material.uniforms
               .dispersionBlendMultiplier,
             1,
-            { value: 6 }
-          )
+            { value: 4 }
+          ) //face sphere
           TweenMax.to(
             this.arrB[this.index + 2].material.uniforms
               .dispersionBlendMultiplier,
             1,
-            { value: 4 }
+            { value: 1.5 }
           )
           TweenMax.to(
             this.arrB[this.index].material.uniforms.dispersionBlendMultiplier,
             1,
-            { value: 4 }
+            { value: 1.5 }
           )
         }
 
@@ -608,7 +921,6 @@ export default class Slider {
 
     if (direction == 'back' && this.index > 0) {
       const i = this.index - 1
-      dispatch(i)
 
       this.animateCurve({
         floatIndex,
@@ -622,6 +934,7 @@ export default class Slider {
       if (!materialChanged) {
         for (let i = 0; i < this.arrB.length; i++) {
           if (i != this.index - 1 && i != this.index - 2 && i != this.index) {
+            this.recompileShader(this.arrB[i], 20)
             TweenMax.to(
               this.arrB[i].material.uniforms.dispersionBlendMultiplier,
               1,
@@ -629,42 +942,47 @@ export default class Slider {
             )
           }
         }
-
         if (this.index == 1) {
+          this.recompileShader(this.arrB[this.index - 1], 50)
+          this.recompileShader(this.arrB[this.arrB.length - 1], 30)
+          this.recompileShader(this.arrB[this.index], 30)
           TweenMax.to(
             this.arrB[this.index - 1].material.uniforms
               .dispersionBlendMultiplier,
             1,
-            { value: 6 }
+            { value: 4 }
           )
           TweenMax.to(
             this.arrB[this.arrB.length - 1].material.uniforms
               .dispersionBlendMultiplier,
             1,
-            { value: 4 }
+            { value: 1.5 }
           )
           TweenMax.to(
             this.arrB[this.index].material.uniforms.dispersionBlendMultiplier,
             1,
-            { value: 4 }
+            { value: 1.5 }
           )
         } else {
+          this.recompileShader(this.arrB[this.index - 1], 50)
+          this.recompileShader(this.arrB[this.index - 2], 30)
+          this.recompileShader(this.arrB[this.index], 30)
           TweenMax.to(
             this.arrB[this.index - 1].material.uniforms
               .dispersionBlendMultiplier,
             1,
-            { value: 6 }
+            { value: 4 }
           )
           TweenMax.to(
             this.arrB[this.index - 2].material.uniforms
               .dispersionBlendMultiplier,
             1,
-            { value: 4 }
+            { value: 1.5 }
           )
           TweenMax.to(
             this.arrB[this.index].material.uniforms.dispersionBlendMultiplier,
             1,
-            { value: 4 }
+            { value: 1.5 }
           )
         }
 
@@ -674,7 +992,6 @@ export default class Slider {
 
     if (direction == 'next' && this.index == this.arrOrbits.length - 1) {
       const i = 0
-      dispatch(i)
 
       this.animateCurve({
         floatIndex,
@@ -688,6 +1005,7 @@ export default class Slider {
       if (!materialChanged) {
         for (let i = 0; i < this.arrB.length; i++) {
           if (i != 0 && i != this.index && i != 1) {
+            this.recompileShader(this.arrB[i], 20)
             TweenMax.to(
               this.arrB[i].material.uniforms.dispersionBlendMultiplier,
               1,
@@ -695,32 +1013,30 @@ export default class Slider {
             )
           }
         }
-
+        this.recompileShader(this.arrB[0], 50)
+        this.recompileShader(this.arrB[this.index], 30)
+        this.recompileShader(this.arrB[1], 30)
         TweenMax.to(
           this.arrB[0].material.uniforms.dispersionBlendMultiplier,
           1,
-          { value: 6 }
+          { value: 4 }
         )
-
         TweenMax.to(
           this.arrB[this.index].material.uniforms.dispersionBlendMultiplier,
           1,
-          { value: 4 }
+          { value: 1.5 }
         )
-
         TweenMax.to(
           this.arrB[1].material.uniforms.dispersionBlendMultiplier,
           1,
-          { value: 4 }
+          { value: 1.5 }
         )
-
         materialChanged = true
       }
     }
 
     if (direction == 'back' && this.index == 0) {
       const i = this.arrOrbits.length - 1
-      dispatch(i)
 
       this.animateCurve({
         floatIndex,
@@ -734,6 +1050,7 @@ export default class Slider {
       if (!materialChanged) {
         for (let i = 0; i < this.arrB.length; i++) {
           if (i != this.arrB.length - 1) {
+            this.recompileShader(this.arrB[i], 20)
             TweenMax.to(
               this.arrB[i].material.uniforms.dispersionBlendMultiplier,
               1,
@@ -741,27 +1058,26 @@ export default class Slider {
             )
           }
         }
-
+        this.recompileShader(this.arrB[this.arrB.length - 1], 50)
+        this.recompileShader(this.arrB[0], 30)
+        this.recompileShader(this.arrB[this.arrB.length - 2], 30)
         TweenMax.to(
           this.arrB[this.arrB.length - 1].material.uniforms
             .dispersionBlendMultiplier,
           1,
-          { value: 6 }
+          { value: 4 }
         )
-
         TweenMax.to(
           this.arrB[0].material.uniforms.dispersionBlendMultiplier,
           1,
-          { value: 4 }
+          { value: 1.5 }
         )
-
         TweenMax.to(
           this.arrB[this.arrB.length - 2].material.uniforms
             .dispersionBlendMultiplier,
           1,
-          { value: 4 }
+          { value: 1.5 }
         )
-
         materialChanged = true
       }
     }
@@ -770,22 +1086,137 @@ export default class Slider {
   inMenu() {
     this.moving = true
 
-    TweenMax.to(this.camera.rotation, 0.8, {
-      y: this.camera.rotation.y + Math.PI,
+    let newPos = new THREE.Vector3(
+      this.camera.position.x,
+      this.camera.position.y,
+      this.camera.position.z
+    )
+    newPos.x *= 1.1
+    newPos.z *= 1.1
+
+    this.TGroup.position.set(newPos.x, 500, newPos.z)
+    let tmpControlBezier =
+      this.index + 1 > this.arrOrbits.length - 1
+        ? this.arrB[0].position
+        : this.arrB[this.index + 1].position
+
+    let tmpfloat = { value: 0 }
+    let focusBezier = new THREE.QuadraticBezierCurve3(
+      new THREE.Vector3(),
+      tmpControlBezier,
+      this.TGroup.position
+    )
+    this.TGroup.visible = true
+    this.about.material.uniforms.color.value = new THREE.Color(0xffffff)
+    this.works.material.uniforms.color.value = new THREE.Color(0xcbcbcb)
+    this.contact.material.uniforms.color.value = new THREE.Color(0xcbcbcb)
+
+    TweenMax.to(tmpfloat, 2, {
+      value: 1,
+      ease: Power2.easeOut,
+      onUpdate: () => {
+        this.focus.set(
+          focusBezier.getPointAt(tmpfloat.value).x,
+          focusBezier.getPointAt(tmpfloat.value).y,
+          focusBezier.getPointAt(tmpfloat.value).z
+        )
+      },
       onComplete: () => {
+        this.inMenu = true
         this.moving = false
+        for (let i = 0; i < this.arrB.length; i++) {
+          this.arrB[i].visible = false
+        }
       }
     })
   }
 
   outMenu() {
     this.moving = true
+    let tmpControlBezier =
+      this.index + 1 > this.arrOrbits.length - 1
+        ? this.arrB[0].position
+        : this.arrB[this.index + 1].position
+    let tmpfloat = { value: 0 }
+    let focusBezier = new THREE.QuadraticBezierCurve3(
+      this.TGroup.position,
+      tmpControlBezier,
+      new THREE.Vector3()
+    )
 
-    TweenMax.to(this.camera.rotation, 0.8, {
-      y: this.camera.rotation.y - Math.PI,
+    for (let i = 0; i < this.arrB.length; i++) {
+      this.arrB[i].visible = true
+    }
+
+    TweenMax.to(tmpfloat, 2, {
+      value: 1,
+      ease: Power2.easeInOut,
+      onUpdate: () => {
+        this.focus.set(
+          focusBezier.getPointAt(tmpfloat.value).x,
+          focusBezier.getPointAt(tmpfloat.value).y,
+          focusBezier.getPointAt(tmpfloat.value).z
+        )
+      },
       onComplete: () => {
+        this.TGroup.visible = false
+        this.inMenu = false
         this.moving = false
       }
     })
+  }
+
+  destroy() {
+    this.pause()
+
+    // Remove listeners
+    window.removeEventListener('resize', this.onWindowResize)
+    this.container.removeEventListener('mousemove', this.onMouseMove)
+
+    // Remove container and canvas
+    this.container.remove()
+  }
+
+  start() {
+    loop.add(this.animate.bind(this), 'slider')
+  }
+
+  pause() {
+    loop.remove('slider', true)
+  }
+
+  sceneVisibleControl(statement) {
+    for (let i = 0; i < this.scene.children.length; i++) {
+      this.scene.children[i].visible = statement
+    }
+  }
+
+  fill({ r, g, b }, time, textobj) {
+    let menutexts = ['about', 'works', 'contact']
+
+    for (let i = 0; i < menutexts.length; i++) {
+      if (textobj.name != menutexts[i]) {
+        this[menutexts[i]].material.uniforms.color.value = new THREE.Color(
+          0xcbcbcb
+        )
+      }
+    }
+
+    TweenMax.to(textobj.material.uniforms.color.value, time, {
+      r,
+      g,
+      b
+    })
+  }
+
+  onWindowResize() {
+    this.camera.aspect = window.innerWidth / window.innerHeight
+    this.camera.updateProjectionMatrix()
+
+    this.container.width = window.innerWidth
+    this.container.height = window.innerHeight
+
+    this.renderer.setPixelRatio(window.devicePixelRatio)
+    this.renderer.setSize(window.innerWidth, window.innerHeight)
   }
 }
