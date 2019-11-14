@@ -512,6 +512,7 @@ export default class Slider {
     this.container.dispatchEvent(new Event('init:complete'))
 
     this.adapt()
+    this.adaptVisible()
     this.start()
   }
 
@@ -913,13 +914,7 @@ export default class Slider {
           value: 1
         })
 
-        if (this.adaptMode) {
-          for (let i = 0; i < this.arrB.length; i++) {
-            if (i != this.index) {
-              this.arrB[i].visible = false
-            }
-          }
-        }
+        this.adaptVisible()
       },
       onUpdate: () => {
         this.camera.lookAt(this.scene.position)
@@ -1316,6 +1311,14 @@ export default class Slider {
       this.about.position.x = -1200
       this.works.position.x = -1200
       this.contact.position.x = -1200
+    }
+  }
+
+  adaptVisible() {
+    if (this.adaptMode) {
+      for (let i = 0; i < this.arrB.length; i++) {
+        this.arrB[i].visible = i == this.index
+      }
     }
   }
 }
