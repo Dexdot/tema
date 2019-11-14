@@ -1231,8 +1231,12 @@ export default class Slider {
       new THREE.Vector3()
     )
 
-    for (let i = 0; i < this.arrB.length; i++) {
-      this.arrB[i].visible = true
+    if (this.adaptMode) {
+      this.arrB[this.index].visible = true
+    } else {
+      for (let i = 0; i < this.arrB.length; i++) {
+        this.arrB[i].visible = true
+      }
     }
 
     TweenMax.to(tmpfloat, 2, {
@@ -1258,8 +1262,13 @@ export default class Slider {
   }
 
   sceneVisibleControl(statement) {
-    for (let i = 0; i < this.scene.children.length; i++) {
-      this.scene.children[i].visible = statement
+    if (!this.adaptMode) {
+      for (let i = 0; i < this.scene.children.length; i++) {
+        this.scene.children[i].visible = statement
+      }
+    } else {
+      this.arrB[this.index].visible = statement
+      this.oceanText.visible = statement
     }
   }
 
@@ -1312,6 +1321,8 @@ export default class Slider {
       this.works.position.x = -1200
       this.contact.position.x = -1200
     }
+
+    if (!this.inMenu || !this.insideSphere) this.adaptVisible()
   }
 
   adaptVisible() {
