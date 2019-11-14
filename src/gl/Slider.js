@@ -13,6 +13,7 @@ export default class Slider {
     this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(
       navigator.userAgent
     )
+    this.adaptMode = false
 
     // Scene
     this.scene = new THREE.Scene()
@@ -444,6 +445,8 @@ export default class Slider {
     aboutPlane.name = 'about'
     aboutPlane.position.x = -870
     aboutPlane.position.y = 200
+    this.about.p = aboutPlane
+
     this.TGroup.add(aboutPlane)
 
     // Works plane
@@ -454,6 +457,7 @@ export default class Slider {
     worksPlane.name = 'works'
     worksPlane.position.x = -800
     worksPlane.position.y = -55
+    this.works.p = worksPlane
     this.TGroup.add(worksPlane)
 
     // Contact plane
@@ -464,6 +468,7 @@ export default class Slider {
     contactPlane.name = 'contact'
     contactPlane.position.x = -800
     contactPlane.position.y = -300
+    this.contact.p = contactPlane
     this.TGroup.add(contactPlane)
 
     this.scene.add(this.TGroup)
@@ -502,6 +507,7 @@ export default class Slider {
 
     this.container.dispatchEvent(new Event('init-complete'))
 
+    this.adapt()
     this.start()
   }
 
@@ -1218,5 +1224,27 @@ export default class Slider {
 
     this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.setSize(window.innerWidth, window.innerHeight)
+
+    this.adapt()
+  }
+
+  adapt() {
+    this.adaptMode = window.innerWidth <= 1024
+
+    if (this.adaptMode) {
+      this.about.p.position.x = 0
+      this.works.p.position.x = 0
+      this.contact.p.position.x = 0
+      this.about.position.x = -350
+      this.works.position.x = -370
+      this.contact.position.x = -380
+    } else {
+      this.about.p.position.x = -870
+      this.works.p.position.x = -800
+      this.contact.p.position.x = -800
+      this.about.position.x = -1200
+      this.works.position.x = -1200
+      this.contact.position.x = -1200
+    }
   }
 }
