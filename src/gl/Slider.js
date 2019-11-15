@@ -627,22 +627,7 @@ export default class Slider {
         }
 
         if (objName == this.index) {
-          this.moving = true
-
-          TweenMax.killAll(false, true, false)
-          TweenMax.to(this.container.style, 1.5, {
-            opacity: 1
-          })
-          TweenMax.to(this.camera.position, 1.5, {
-            x: this.arrB[this.index].position.x * 1.1,
-            y: this.arrB[this.index].position.y,
-            z: this.arrB[this.index].position.z * 1.1,
-            onComplete: () => {
-              console.log('onClick - active sphere: router.push')
-              this.container.dispatchEvent(new Event('click:active'))
-              // this.enter()
-            }
-          })
+          this.in()
         }
       }
     } else {
@@ -784,9 +769,12 @@ export default class Slider {
 
   in() {
     this.moving = true
+    this.container.dispatchEvent(new Event('enter:begin'))
 
     TweenMax.killAll(false, true, false)
-    TweenMax.to(this.container.style, 1.5, { opacity: 1 })
+
+    TweenMax.to(this.container, 1.5, { opacity: 0 })
+
     TweenMax.to(this.camera.position, 1.5, {
       x: this.arrB[this.index].position.x * 1.1,
       y: this.arrB[this.index].position.y,
@@ -799,14 +787,16 @@ export default class Slider {
 
   out() {
     this.moving = true
+    this.container.dispatchEvent(new Event('out:begin'))
+
     TweenMax.to(this, 1.5, { time: 9.95 })
 
     TweenMax.to(this.insideCamera.position, 1.5, {
       x: -396.2
     })
 
-    TweenMax.to(this.container.style, 1.5, {
-      opacity: 1,
+    TweenMax.to(this.container, 1.5, {
+      opacity: 0,
       onComplete: () => {
         this.back()
       }
@@ -824,8 +814,8 @@ export default class Slider {
     this.insideSphere.visible = true
     this.time = 9.95
 
-    TweenMax.to(this.container.style, 1.5, {
-      opacity: 0,
+    TweenMax.to(this.container, 1.5, {
+      opacity: 1,
       onComplete: () => {
         this.camera.fov = 75
       }
@@ -837,16 +827,17 @@ export default class Slider {
       x: 4,
       onComplete: () => {
         this.moving = false
+        console.log('onClick - active sphere: router.push')
+        this.container.dispatchEvent(new Event('enter:complete'))
       }
     })
   }
 
   back() {
+    this.time = 17
+    this.camera.fov = 95
     this.moving = true
 
-    this.time = 17
-
-    this.camera.fov = 95
     this.sceneVisibleControl(true)
     this.TGroup.visible = false
     this.insideSphere.visible = false
@@ -855,6 +846,7 @@ export default class Slider {
       this.arrB[this.index].position.y,
       this.arrB[this.index].position.z * 1.1
     )
+
     TweenMax.to(this.camera.position, 1.5, {
       ease: Power2.easeOut,
       x: this.arrOrbits[this.index].getPointAt(0.5 + this.mouse.x * 0.1).x,
@@ -865,10 +857,12 @@ export default class Slider {
       },
       onComplete: () => {
         this.moving = false
+        this.container.dispatchEvent(new Event('out:complete'))
       }
     })
-    TweenMax.to(this.container.style, 1.5, {
-      opacity: 0
+
+    TweenMax.to(this.container, 1.5, {
+      opacity: 1
     })
   }
 
@@ -929,13 +923,19 @@ export default class Slider {
   }
 
   indexControl(direction) {
-    if (this.inMenu && this.moving && this.insideSphere.visible) return false
+    if (this.inMenu || this.moving || this.insideSphere.visible) return false
 
     let floatIndex = { value: 0 }
     let materialChanged = false
 
+    const dispatch = i => {
+      const ev = new CustomEvent('index:changed', { detail: { i } })
+      this.container.dispatchEvent(ev)
+    }
+
     if (direction == 'next' && this.index < this.arrOrbits.length - 1) {
       const i = this.index + 1
+      dispatch(i)
 
       this.animateCurve({
         floatIndex,
@@ -1006,6 +1006,7 @@ export default class Slider {
 
     if (direction == 'back' && this.index > 0) {
       const i = this.index - 1
+      dispatch(i)
 
       this.animateCurve({
         floatIndex,
@@ -1077,6 +1078,7 @@ export default class Slider {
 
     if (direction == 'next' && this.index == this.arrOrbits.length - 1) {
       const i = 0
+      dispatch(i)
 
       this.animateCurve({
         floatIndex,
@@ -1122,6 +1124,7 @@ export default class Slider {
 
     if (direction == 'back' && this.index == 0) {
       const i = this.arrOrbits.length - 1
+      dispatch(i)
 
       this.animateCurve({
         floatIndex,

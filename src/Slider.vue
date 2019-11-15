@@ -1,11 +1,11 @@
 <template>
-  <section class="slider-container slider" @click="onClick">
+  <section class="slider-container slider">
     <div class="slider" id="slider"></div>
     <h1 class="slider-title">
       <span ref="title">{{ title }}</span>
     </h1>
 
-    <div class="slider-counter">
+    <div class="slider-counter" v-if="inited">
       <span>{{ num }}</span>
       <span></span>
       <span>{{ len }}</span>
@@ -24,15 +24,17 @@ export default {
   name: 'Slider',
   props: ['scroll', 'detect', 'isMenuActive'],
   data: () => ({
+    index: 0,
+    inited: false,
     slider: null,
     title: ''
   }),
   computed: {
     num() {
-      return this.slider ? `0${this.slider.index + 1}` : ''
+      return this.inited ? `0${this.index + 1}` : ''
     },
     len() {
-      return this.slider
+      return this.inited
         ? `0${Object.keys(this.slider.sceneParams).length}`
         : ''
     }
@@ -53,55 +55,47 @@ export default {
       images,
       three
     })
-    container.addEventListener('init-complete', () => {
-      console.log('init-complete')
-      this.$emit('init', this.slider)
-    })
-  },
-  methods: {
-    onClick() {
-      console.log(
-        'click',
-        `/case/${this.slider.sceneParams[this.slider.index].slug}`
-      )
 
-      // this.$router.push(
-      //   `/case/${this.slider.sceneParams[this.slider.index].slug}`
-      // )
-    }
+    // Init complete
+    container.addEventListener('init:complete', () => {
+      console.log('init:complete')
+
+      this.inited = true
+      this.index = this.slider.index
+      this.$emit('init', this.slider)
+
+      window.slider = this.slider
+    })
+
+    // Index control
+    container.addEventListener('index:changed', ({ detail }) => {
+      this.index = detail.i
+    })
+
+    // Go to main
+    container.addEventListener('out:complete', () => {
+      this.$router.push('/')
+    })
+
+    // Go to case
+    container.addEventListener('enter:complete', () => {
+      this.$router.push(`/case/${this.slider.sceneParams[this.index].slug}`)
+    })
   },
   watch: {
     'scroll.counter'() {
+      if (!this.inited) return false
+
       let dir = 'next'
+
       if (this.detect.isSafari || this.detect.isMobileDevice) {
         dir = this.scroll.direction === 1 ? 'next' : 'back'
       } else {
         dir = this.scroll.deltaY < 0 ? 'next' : 'back'
       }
-      console.log('dir: ' + dir)
 
-      // this.slider.indexControl(dir)
+      this.slider.indexControl(dir)
     }
-    // isMenuActive(isActive) {
-    //   if (isActive) {
-    //     this.slider.inMenu()
-    //     anime({
-    //       targets: '.slider-title, .slider-counter',
-    //       duration: 300,
-    //       easing: 'easeInCubic',
-    //       opacity: 0
-    //     })
-    //   } else {
-    //     this.slider.outMenu()
-    //     anime({
-    //       targets: '.slider-title, .slider-counter',
-    //       duration: 300,
-    //       delay: 300,
-    //       easing: 'easeOutCubic',
-    //       opacity: 1
-    //     })
-    //   }
-    // }
   }
 }
 </script>

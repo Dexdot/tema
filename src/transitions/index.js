@@ -1,12 +1,13 @@
-import Main from '@/transitions/Main'
-import Case from '@/transitions/Case'
+// import Main from '@/transitions/Main'
+// import Case from '@/transitions/Case'
+import Fade from '@/transitions/Fade'
 
 const transitions = {
   index: {
-    ...Main
+    ...Fade
   },
   case: {
-    ...Case
+    ...Fade
   }
 }
 

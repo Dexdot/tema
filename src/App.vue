@@ -1,34 +1,47 @@
 <template>
   <div id="app">
-    <Menu :active="isMenuActive" />
-    <Main :isMenuActive="isMenuActive" @toggle-menu="toggleMenu" />
+    <!-- <Menu :active="isMenuActive" /> -->
+    <!-- <Main :isMenuActive="isMenuActive" @toggle-menu="toggleMenu" /> -->
+    <Main />
+    <Slider
+      :scroll="$refs.scroll && $refs.scroll.scroll"
+      :detect="$refs.scroll && $refs.scroll.detect"
+    />
 
     <!-- <div :class="['scroll', { hidden: hideContent }]"> -->
     <div class="scroll">
       <Scroll ref="scroll">
-        <transition
+        <!-- <transition
           v-if="mounted"
           @enter="enter"
           @leave="leave"
           :css="false"
           mode="out-in"
-        >
-          <router-view
+        > -->
+        <router-view
+          ref="view"
+          :key="$route.path"
+          :scroll="$refs.scroll && $refs.scroll.scroll"
+          :detect="$refs.scroll && $refs.scroll.detect"
+          @disable-scroll="disableScroll"
+        />
+        <!-- <router-view
             ref="view"
             :key="$route.path"
             :scroll="$refs.scroll && $refs.scroll.scroll"
             :detect="$refs.scroll && $refs.scroll.detect"
             :isMenuActive="isMenuActive"
             @disable-scroll="disableScroll"
-          />
-        </transition>
+          /> -->
+        <!-- </transition> -->
       </Scroll>
     </div>
   </div>
 </template>
 
 <script>
-import Menu from '@/Menu'
+// import Menu from '@/Menu'
+import Slider from '@/Slider.vue'
 import Main from '@/Main.vue'
 import Scroll from '@/Scroll'
 import transitions from '@/transitions/'
@@ -37,20 +50,21 @@ import { isFirefox } from '@/scripts/detect'
 export default {
   name: 'App',
   components: {
-    Menu,
+    // Menu,
+    Slider,
     Main,
     Scroll
   },
   data: () => ({
     mounted: false,
-    isMenuActive: false,
+    // isMenuActive: false,
     dir: {}
   }),
-  computed: {
-    hideContent() {
-      return this.$route.name === 'index' ? false : this.isMenuActive
-    }
-  },
+  // computed: {
+  //   hideContent() {
+  //     return this.$route.name === 'index' ? false : this.isMenuActive
+  //   }
+  // },
   mounted() {
     this.$nextTick(() => {
       this.mounted = true
@@ -64,10 +78,10 @@ export default {
     disableScroll(v) {
       this.$refs.scroll.scroll.disable = v
     },
-    toggleMenu(transition = false) {
-      this.isMenuActive = !this.isMenuActive
-      if (transition) this.disableScroll(this.isMenuActive)
-    },
+    // toggleMenu(transition = false) {
+    //   this.isMenuActive = !this.isMenuActive
+    //   if (transition) this.disableScroll(this.isMenuActive)
+    // },
     resetScroll() {
       this.$refs.scroll.scroll.val = 0
       this.$refs.scroll.scroll.translate = 0
@@ -75,7 +89,7 @@ export default {
     },
     async enter(el, done) {
       const trs = this.dir.to.name
-      await transitions[trs].enter(this.$refs.view)
+      await transitions[trs].enter(this.$refs.view.$el)
       done()
       this.disableScroll(false)
     },
@@ -84,7 +98,7 @@ export default {
     //   const trs = this.dir.to.name
 
     //   const go = async () => {
-    //     await transitions[trs].enter(this.$refs.view)
+    //     await transitions[trs].enter(this.$refs.view.$el)
     //     done()
     //     this.disableScroll(false)
     //   }
@@ -98,11 +112,11 @@ export default {
     //   }
     // },
     async leave(el, done) {
-      if (this.isMenuActive) this.toggleMenu(true)
+      // if (this.isMenuActive) this.toggleMenu(true)
       this.disableScroll(true)
 
       const trs = this.dir.from.name
-      await transitions[trs].leave(this.$refs.view)
+      await transitions[trs].leave(this.$refs.view.$el)
       this.resetScroll()
       done()
     }

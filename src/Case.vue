@@ -4,7 +4,6 @@
       class="case__fixed"
       :style="{ transform: `translate3d(0, ${this.scroll.translate}px, 0)` }"
     >
-      <Inside @init="onSceneInit" />
       <h1 class="case__title">
         <span>{{ content.title }}</span>
       </h1>
@@ -37,52 +36,45 @@
 </template>
 
 <script>
-import Next from "@/Next";
-import Inside from "@/Inside";
-import { getCase } from "@/scripts/api";
+import Next from '@/Next'
+import { getCase } from '@/scripts/api'
 
 export default {
-  name: "Case",
+  name: 'Case',
   components: {
-    Inside,
     Next
   },
-  props: ["scroll"],
+  props: ['scroll'],
   data: () => ({
-    content: {},
-    scene: null
+    content: {}
   }),
   async created() {
-    this.content = await getCase(this, this.$route.params.id);
+    this.content = await getCase(this, this.$route.params.id)
     this.$nextTick(() => {
-      this.observe();
-    });
+      this.observe()
+    })
   },
   methods: {
-    onSceneInit(scene) {
-      this.scene = scene;
-      this.$el.dispatchEvent(new Event("init-complete"));
-    },
     observe() {
       const observer = new IntersectionObserver(
         entries => {
           entries.forEach(({ target, isIntersecting }) => {
             if (isIntersecting) {
-              target.classList.add("visible");
+              target.classList.add('visible')
             } else {
-              target.classList.remove("visible");
+              target.classList.remove('visible')
             }
-          });
+          })
         },
         { threshold: [0, 0.5, 1] }
-      );
+      )
 
       this.$refs.images.forEach(img => {
-        observer.observe(img);
-      });
+        observer.observe(img)
+      })
     }
   }
-};
+}
 </script>
 
 <style lang="sass" scoped>
@@ -97,10 +89,6 @@ export default {
   top: 50vh
   left: 50%
 
-.case__fixed .inside
-  transform: translate(-50%, -50%)
-  pointer-events: none
-
 body.is-safari,
 body.is-mob
   .case__fixed
@@ -111,7 +99,6 @@ body.is-mob
     width: 100vw
     height: 100vh
 
-    .inside,
     .case__title
       position: absolute
       top: 50%
@@ -176,7 +163,7 @@ body.is-mob
 
   position: relative
 
-  opacity: 0
+  // opacity: 0
 
   @media (max-width: 800px)
     width: 80vw
