@@ -117,7 +117,6 @@ body.is-mob
   span
     display: block
     transform: translateY(110%)
-    transition: transform 0.8s ease
 
 .case__caption
   position: relative
@@ -163,7 +162,7 @@ body.is-mob
 
   position: relative
 
-  // opacity: 0
+  opacity: 0
 
   @media (max-width: 800px)
     width: 80vw
@@ -219,7 +218,6 @@ body.is-mob
   margin-top: 17vh
   margin-bottom: 17vh
   margin-left: -12.9vw
-  // max-width: unset
   width: 75.8vw
   @media (max-width: 800px)
     width: 80vw

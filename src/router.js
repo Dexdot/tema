@@ -16,11 +16,6 @@ export default new Router({
       path: '/case/:id',
       name: 'case',
       component: () => import('@/Case.vue')
-    },
-    {
-      path: '/inside',
-      name: 'inside',
-      component: () => import('@/Inside.vue')
     }
   ]
 })

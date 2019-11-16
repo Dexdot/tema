@@ -42,7 +42,10 @@
       <SoundBar />
     </div>
 
-    <MenuButton @click="$emit('toggle-menu')" :isMenuActive="isMenuActive" />
+    <MenuButton
+      @click="$emit('btn-click', !isMenuActive)"
+      :isMenuActive="isMenuActive"
+    />
   </div>
 </template>
 

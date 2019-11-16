@@ -1,70 +1,67 @@
 <template>
   <div id="app">
-    <!-- <Menu :active="isMenuActive" /> -->
-    <!-- <Main :isMenuActive="isMenuActive" @toggle-menu="toggleMenu" /> -->
-    <Main />
+    <Main :isMenuActive="isMenuActive" @btn-click="onMenuButtonClick" />
     <Slider
+      ref="scene"
+      :show="showScene"
       :scroll="$refs.scroll && $refs.scroll.scroll"
       :detect="$refs.scroll && $refs.scroll.detect"
+      @toggle-menu="toggleMenu"
+      @init="onSceneInit"
     />
 
-    <!-- <div :class="['scroll', { hidden: hideContent }]"> -->
-    <div class="scroll">
+    <div :class="['scroll', { hidden: hideContent }]">
       <Scroll ref="scroll">
-        <!-- <transition
+        <transition
           v-if="mounted"
           @enter="enter"
           @leave="leave"
           :css="false"
           mode="out-in"
-        > -->
-        <router-view
-          ref="view"
-          :key="$route.path"
-          :scroll="$refs.scroll && $refs.scroll.scroll"
-          :detect="$refs.scroll && $refs.scroll.detect"
-          @disable-scroll="disableScroll"
-        />
-        <!-- <router-view
+        >
+          <router-view
             ref="view"
             :key="$route.path"
             :scroll="$refs.scroll && $refs.scroll.scroll"
             :detect="$refs.scroll && $refs.scroll.detect"
             :isMenuActive="isMenuActive"
             @disable-scroll="disableScroll"
-          /> -->
-        <!-- </transition> -->
+          />
+        </transition>
       </Scroll>
     </div>
   </div>
 </template>
 
 <script>
-// import Menu from '@/Menu'
 import Slider from '@/Slider.vue'
 import Main from '@/Main.vue'
 import Scroll from '@/Scroll'
-import transitions from '@/transitions/'
 import { isFirefox } from '@/scripts/detect'
 
 export default {
   name: 'App',
   components: {
-    // Menu,
     Slider,
     Main,
     Scroll
   },
   data: () => ({
+    sceneInited: false,
     mounted: false,
-    // isMenuActive: false,
+    isMenuActive: false,
     dir: {}
   }),
-  // computed: {
-  //   hideContent() {
-  //     return this.$route.name === 'index' ? false : this.isMenuActive
-  //   }
-  // },
+  computed: {
+    hideContent() {
+      return this.$route.name === 'index' ? false : this.isMenuActive
+    },
+    showScene() {
+      return this.sceneInited
+        ? ['index', 'case'].includes(this.$route.name)
+        : false
+    }
+  },
   mounted() {
     this.$nextTick(() => {
       this.mounted = true
@@ -75,50 +72,53 @@ export default {
     })
   },
   methods: {
+    onSceneInit() {
+      this.sceneInited = true
+      if (this.$route.name === 'case') this.$refs.scene.slider.enter(true)
+    },
+    onMenuButtonClick(showMenu) {
+      if (showMenu) {
+        this.$refs.scene.slider.showMenu()
+      } else {
+        this.$refs.scene.slider.hideMenu()
+      }
+    },
     disableScroll(v) {
       this.$refs.scroll.scroll.disable = v
     },
-    // toggleMenu(transition = false) {
-    //   this.isMenuActive = !this.isMenuActive
-    //   if (transition) this.disableScroll(this.isMenuActive)
-    // },
+    toggleMenu(v) {
+      this.isMenuActive = v
+    },
     resetScroll() {
       this.$refs.scroll.scroll.val = 0
       this.$refs.scroll.scroll.translate = 0
       window.scrollTo(0, 0)
     },
     async enter(el, done) {
-      const trs = this.dir.to.name
-      await transitions[trs].enter(this.$refs.view.$el)
-      done()
+      const { name } = this.dir.to
+
+      if (name === 'case' && this.sceneInited) {
+        await this.$refs.scene.slider.in()
+        done()
+      } else {
+        done()
+      }
       this.disableScroll(false)
     },
-    // async enter(el, done) {
-    //   const asyncPages = ['index', 'case']
-    //   const trs = this.dir.to.name
-
-    //   const go = async () => {
-    //     await transitions[trs].enter(this.$refs.view.$el)
-    //     done()
-    //     this.disableScroll(false)
-    //   }
-
-    //   if (asyncPages.includes(trs)) {
-    //     el.addEventListener('init-complete', () => {
-    //       go()
-    //     })
-    //   } else {
-    //     go()
-    //   }
-    // },
     async leave(el, done) {
-      // if (this.isMenuActive) this.toggleMenu(true)
-      this.disableScroll(true)
+      if (this.isMenuActive) await this.$refs.scene.slider.hideMenu()
 
-      const trs = this.dir.from.name
-      await transitions[trs].leave(this.$refs.view.$el)
-      this.resetScroll()
-      done()
+      const { name } = this.dir.from
+      if (name === 'case' && this.sceneInited) {
+        await this.$refs.scene.slider.out()
+        this.resetScroll()
+        done()
+      } else {
+        this.resetScroll()
+        done()
+      }
+
+      this.disableScroll(true)
     }
   },
   watch: {
@@ -154,10 +154,10 @@ body.is-mob
 </style>
 
 <style lang="sass" scoped>
-// .scroll
-//   transition: opacity 0.25s ease
-//   &.hidden
-//     opacity: 0
-//     pointer-events: none
-//     user-select: none
+.scroll
+  transition: opacity 0.25s ease
+  &.hidden
+    opacity: 0
+    pointer-events: none
+    user-select: none
 </style>

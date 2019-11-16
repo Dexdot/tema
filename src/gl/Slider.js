@@ -1,15 +1,18 @@
 import { TweenMax, Power2 } from 'gsap'
 import loop from '@/scripts/loop'
+import { isMobileSafari } from '@/scripts/detect'
 
 let THREE = null
 
 export default class Slider {
   constructor(props) {
-    const { selector, images, three } = props
+    const { selector, images, three, initialSlug } = props
     THREE = three
     this.images = images
     this.selector = selector
+    this.initialSlug = initialSlug
 
+    this.isMobileSafari = isMobileSafari()
     this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(
       navigator.userAgent
     )
@@ -513,6 +516,8 @@ export default class Slider {
 
     this.adapt()
     this.adaptVisible()
+    this.onWindowResize()
+
     this.start()
   }
 
@@ -608,10 +613,8 @@ export default class Slider {
 
         if (objName > this.index) {
           if (this.index == 0 && objName == this.arrB.length - 1) {
-            console.log('onClick - indexControl:back')
             this.indexControl('back')
           } else {
-            console.log('onClick - indexControl:next')
             this.indexControl('next')
           }
         }
@@ -621,13 +624,12 @@ export default class Slider {
             console.log('onClick - indexControl:next')
             this.indexControl('next')
           } else {
-            console.log('onClick - indexControl:back')
             this.indexControl('back')
           }
         }
 
         if (objName == this.index) {
-          this.in()
+          this.container.dispatchEvent(new Event('click:active'))
         }
       }
     } else {
@@ -768,101 +770,116 @@ export default class Slider {
   }
 
   in() {
-    this.moving = true
-    this.container.dispatchEvent(new Event('enter:begin'))
+    return new Promise(resolve => {
+      this.moving = true
+      this.container.dispatchEvent(new Event('enter:begin'))
 
-    TweenMax.killAll(false, true, false)
+      TweenMax.killAll(false, true, false)
 
-    TweenMax.to(this.container, 1.5, { opacity: 0 })
+      TweenMax.to(this.container, 1.5, { opacity: 0 })
 
-    TweenMax.to(this.camera.position, 1.5, {
-      x: this.arrB[this.index].position.x * 1.1,
-      y: this.arrB[this.index].position.y,
-      z: this.arrB[this.index].position.z * 1.1,
-      onComplete: () => {
-        this.enter()
-      }
+      TweenMax.to(this.camera.position, 1.5, {
+        x: this.arrB[this.index].position.x * 1.1,
+        y: this.arrB[this.index].position.y,
+        z: this.arrB[this.index].position.z * 1.1,
+        onComplete: () => {
+          this.enter().then(resolve)
+        }
+      })
     })
   }
 
   out() {
-    this.moving = true
-    this.container.dispatchEvent(new Event('out:begin'))
+    return new Promise(resolve => {
+      this.moving = true
+      this.container.dispatchEvent(new Event('out:begin'))
 
-    TweenMax.to(this, 1.5, { time: 9.95 })
+      TweenMax.to(this, 1.5, { time: 9.95 })
 
-    TweenMax.to(this.insideCamera.position, 1.5, {
-      x: -396.2
-    })
+      TweenMax.to(this.insideCamera.position, 1.5, {
+        x: -396.2
+      })
 
-    TweenMax.to(this.container, 1.5, {
-      opacity: 0,
-      onComplete: () => {
-        this.back()
-      }
+      TweenMax.to(this.container, 1.5, {
+        opacity: 0,
+        onComplete: () => {
+          this.back().then(resolve)
+        }
+      })
     })
   }
 
-  enter() {
-    this.moving = true
-
-    this.insideSphere.material.uniforms.envMap.value = this.arrB[
-      this.index
-    ].material.uniforms.tCube.value
-    this.sceneVisibleControl(false)
-    this.camera.position.z = 0
-    this.insideSphere.visible = true
-    this.time = 9.95
-
-    TweenMax.to(this.container, 1.5, {
-      opacity: 1,
-      onComplete: () => {
-        this.camera.fov = 75
+  enter(prepare) {
+    return new Promise(resolve => {
+      if (prepare) {
+        const paramsArray = Object.values(this.sceneParams)
+        const active = paramsArray.find(e => e.slug === this.initialSlug)
+        this.index = paramsArray.indexOf(active)
       }
-    })
 
-    TweenMax.to(this, 5, { time: 10.32 })
-    this.insideCamera.position.set(-396.2, 20, 0)
-    TweenMax.to(this.insideCamera.position, 3, {
-      x: 4,
-      onComplete: () => {
-        this.moving = false
-        console.log('onClick - active sphere: router.push')
-        this.container.dispatchEvent(new Event('enter:complete'))
-      }
+      this.moving = true
+
+      this.insideSphere.material.uniforms.envMap.value = this.arrB[
+        this.index
+      ].material.uniforms.tCube.value
+      this.sceneVisibleControl(false)
+      this.camera.position.z = 0
+      this.insideSphere.visible = true
+      this.time = 9.95
+
+      TweenMax.to(this.container, 1.5, {
+        opacity: 1,
+        onComplete: () => {
+          this.camera.fov = 75
+        }
+      })
+
+      TweenMax.to(this, 5, { time: 10.32 })
+      this.insideCamera.position.set(-396.2, 20, 0)
+      TweenMax.to(this.insideCamera.position, 3, {
+        x: 4,
+        onComplete: () => {
+          this.moving = false
+          this.container.dispatchEvent(new Event('enter:complete'))
+          resolve()
+        }
+      })
     })
   }
 
   back() {
-    this.time = 17
-    this.camera.fov = 95
-    this.moving = true
+    return new Promise(resolve => {
+      this.time = 17
+      this.camera.fov = 95
+      this.moving = true
 
-    this.sceneVisibleControl(true)
-    this.TGroup.visible = false
-    this.insideSphere.visible = false
-    this.camera.position.set(
-      this.arrB[this.index].position.x * 1.1,
-      this.arrB[this.index].position.y,
-      this.arrB[this.index].position.z * 1.1
-    )
+      this.sceneVisibleControl(true)
+      this.TGroup.visible = false
+      this.insideSphere.visible = false
+      this.camera.position.set(
+        this.arrB[this.index].position.x * 1.1,
+        this.arrB[this.index].position.y,
+        this.arrB[this.index].position.z * 1.1
+      )
 
-    TweenMax.to(this.camera.position, 1.5, {
-      ease: Power2.easeOut,
-      x: this.arrOrbits[this.index].getPointAt(0.5 + this.mouse.x * 0.1).x,
-      z: this.arrOrbits[this.index].getPointAt(0.5 + this.mouse.x * 0.1).z,
-      y: this.arrOrbits[this.index].getPointAt(0.5 + this.mouse.x * 0.1).y,
-      onUpdate: () => {
-        this.camera.lookAt(this.scene.position)
-      },
-      onComplete: () => {
-        this.moving = false
-        this.container.dispatchEvent(new Event('out:complete'))
-      }
-    })
+      TweenMax.to(this.camera.position, 1.5, {
+        ease: Power2.easeOut,
+        x: this.arrOrbits[this.index].getPointAt(0.5 + this.mouse.x * 0.1).x,
+        z: this.arrOrbits[this.index].getPointAt(0.5 + this.mouse.x * 0.1).z,
+        y: this.arrOrbits[this.index].getPointAt(0.5 + this.mouse.x * 0.1).y,
+        onUpdate: () => {
+          this.camera.lookAt(this.scene.position)
+        },
+        onComplete: () => {
+          this.moving = false
+          this.container.dispatchEvent(new Event('out:complete'))
+          resolve()
+        }
+      })
 
-    TweenMax.to(this.container, 1.5, {
-      opacity: 1
+      TweenMax.to(this.container, 1.5, {
+        opacity: 1
+      })
     })
   }
 
@@ -929,7 +946,9 @@ export default class Slider {
     let materialChanged = false
 
     const dispatch = i => {
-      const ev = new CustomEvent('index:changed', { detail: { i } })
+      const ev = new CustomEvent('index:changed', {
+        detail: { i }
+      })
       this.container.dispatchEvent(ev)
     }
 
@@ -1171,97 +1190,113 @@ export default class Slider {
     }
   }
 
-  inMenu() {
-    this.raycaster.setFromCamera(this.mouse, this.camera)
+  showMenu() {
+    return new Promise(resolve => {
+      if (this.inMenu || this.moving || this.insideSphere.visible) return false
+      this.container.dispatchEvent(new Event('showmenu:begin'))
 
-    this.moving = true
+      this.raycaster.setFromCamera(this.mouse, this.camera)
 
-    let newPos = new THREE.Vector3(
-      this.camera.position.x,
-      this.camera.position.y,
-      this.camera.position.z
-    )
-    newPos.x *= 1.1
-    newPos.z *= 1.1
+      this.moving = true
 
-    this.TGroup.position.set(newPos.x, 500, newPos.z)
-    let tmpControlBezier =
-      this.index + 1 > this.arrOrbits.length - 1
-        ? this.arrB[0].position
-        : this.arrB[this.index + 1].position
+      let newPos = new THREE.Vector3(
+        this.camera.position.x,
+        this.camera.position.y,
+        this.camera.position.z
+      )
+      newPos.x *= 1.1
+      newPos.z *= 1.1
 
-    let tmpfloat = { value: 0 }
-    let focusBezier = new THREE.QuadraticBezierCurve3(
-      new THREE.Vector3(),
-      tmpControlBezier,
-      this.TGroup.position
-    )
-    this.TGroup.visible = true
-    this.about.material.uniforms.color.value = new THREE.Color(0xffffff)
-    this.works.material.uniforms.color.value = new THREE.Color(0xcbcbcb)
-    this.contact.material.uniforms.color.value = new THREE.Color(0xcbcbcb)
+      this.TGroup.position.set(newPos.x, 500, newPos.z)
+      let tmpControlBezier =
+        this.index + 1 > this.arrOrbits.length - 1
+          ? this.arrB[0].position
+          : this.arrB[this.index + 1].position
 
-    TweenMax.to(tmpfloat, 2, {
-      value: 1,
-      ease: Power2.easeOut,
-      onUpdate: () => {
-        this.focus.set(
-          focusBezier.getPointAt(tmpfloat.value).x,
-          focusBezier.getPointAt(tmpfloat.value).y,
-          focusBezier.getPointAt(tmpfloat.value).z
-        )
-      },
-      onComplete: () => {
-        this.inMenu = true
-        this.moving = false
-        for (let i = 0; i < this.arrB.length; i++) {
-          this.arrB[i].visible = false
+      let tmpfloat = { value: 0 }
+      let focusBezier = new THREE.QuadraticBezierCurve3(
+        new THREE.Vector3(),
+        tmpControlBezier,
+        this.TGroup.position
+      )
+      this.TGroup.visible = true
+      this.about.material.uniforms.color.value = new THREE.Color(0xffffff)
+      this.works.material.uniforms.color.value = new THREE.Color(0xcbcbcb)
+      this.contact.material.uniforms.color.value = new THREE.Color(0xcbcbcb)
+
+      TweenMax.to(tmpfloat, 2, {
+        value: 1,
+        ease: Power2.easeOut,
+        onUpdate: () => {
+          this.focus.set(
+            focusBezier.getPointAt(tmpfloat.value).x,
+            focusBezier.getPointAt(tmpfloat.value).y,
+            focusBezier.getPointAt(tmpfloat.value).z
+          )
+        },
+        onComplete: () => {
+          this.inMenu = true
+          this.moving = false
+          for (let i = 0; i < this.arrB.length; i++) {
+            this.arrB[i].visible = false
+          }
+          this.container.dispatchEvent(new Event('showmenu:complete'))
+          resolve()
         }
-      }
+      })
     })
   }
 
-  outMenu() {
-    this.moving = true
-    let tmpControlBezier =
-      this.index + 1 > this.arrOrbits.length - 1
-        ? this.arrB[0].position
-        : this.arrB[this.index + 1].position
-    let tmpfloat = { value: 0 }
-    let focusBezier = new THREE.QuadraticBezierCurve3(
-      this.TGroup.position,
-      tmpControlBezier,
-      new THREE.Vector3()
-    )
+  hideMenu() {
+    return new Promise(resolve => {
+      this.container.dispatchEvent(new Event('hidemenu:begin'))
+      this.moving = true
+      let tmpControlBezier =
+        this.index + 1 > this.arrOrbits.length - 1
+          ? this.arrB[0].position
+          : this.arrB[this.index + 1].position
+      let tmpfloat = { value: 0 }
+      let focusBezier = new THREE.QuadraticBezierCurve3(
+        this.TGroup.position,
+        tmpControlBezier,
+        new THREE.Vector3()
+      )
 
-    if (this.adaptMode) {
-      this.arrB[this.index].visible = true
-    } else {
-      for (let i = 0; i < this.arrB.length; i++) {
-        this.arrB[i].visible = true
+      if (this.adaptMode) {
+        this.arrB[this.index].visible = true
+      } else {
+        for (let i = 0; i < this.arrB.length; i++) {
+          this.arrB[i].visible = true
+        }
       }
-    }
 
-    TweenMax.to(tmpfloat, 2, {
-      value: 1,
-      ease: Power2.easeInOut,
-      onUpdate: () => {
-        this.focus.set(
-          focusBezier.getPointAt(tmpfloat.value).x,
-          focusBezier.getPointAt(tmpfloat.value).y,
-          focusBezier.getPointAt(tmpfloat.value).z
-        )
-      },
-      onComplete: () => {
-        this.TGroup.visible = false
-        this.inMenu = false
-        this.moving = false
-      }
+      TweenMax.to(tmpfloat, 2, {
+        value: 1,
+        ease: Power2.easeInOut,
+        onUpdate: () => {
+          this.focus.set(
+            focusBezier.getPointAt(tmpfloat.value).x,
+            focusBezier.getPointAt(tmpfloat.value).y,
+            focusBezier.getPointAt(tmpfloat.value).z
+          )
+        },
+        onComplete: () => {
+          this.TGroup.visible = false
+          this.inMenu = false
+          this.moving = false
+          this.container.dispatchEvent(new Event('hidemenu:complete'))
+          resolve()
+        }
+      })
     })
   }
 
   start() {
     loop.add(this.animate.bind(this), 'slider')
+  }
+
+  pause() {
+    loop.remove('slider')
   }
 
   sceneVisibleControl(statement) {
@@ -1294,14 +1329,22 @@ export default class Slider {
   }
 
   onWindowResize() {
-    this.camera.aspect = window.innerWidth / window.innerHeight
+    const h = this.isMobileSafari
+      ? parseFloat(
+          document.documentElement.style
+            .getPropertyValue('--initial-vh')
+            .split('px')[0]
+        ) * 100
+      : window.innerHeight
+
+    this.camera.aspect = window.innerWidth / h
     this.camera.updateProjectionMatrix()
 
     this.container.width = window.innerWidth
-    this.container.height = window.innerHeight
+    this.container.height = h
 
     this.renderer.setPixelRatio(window.devicePixelRatio)
-    this.renderer.setSize(window.innerWidth, window.innerHeight)
+    this.renderer.setSize(window.innerWidth, h)
 
     this.adapt()
   }
