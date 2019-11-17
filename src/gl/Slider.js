@@ -368,7 +368,6 @@ export default class Slider {
       uniforms: THREE.DispersionMaterial.uniforms,
       side: THREE.DoubleSide,
       vertexShader: THREE.DispersionMaterial.vertex_Shader,
-
       fragmentShader: THREE.DispersionMaterial.fragmentShader
     })
     this.insideSphere = new THREE.Mesh(this.bigtestgeometry, this.material)
@@ -637,18 +636,12 @@ export default class Slider {
       let intersects = this.raycaster.intersectObjects(this.TGroup.children)
 
       if (intersects.length > 0) {
-        if (intersects[0].object.name == 'about') {
-          console.log('onClick - menu:about')
-          this.container.dispatchEvent(new Event('click:about'))
-        }
-        if (intersects[0].object.name == 'works') {
-          console.log('onClick - menu:works')
-          this.container.dispatchEvent(new Event('click:works'))
-        }
-        if (intersects[0].object.name == 'contact') {
-          console.log('onClick - menu:contact')
-          this.container.dispatchEvent(new Event('click:contact'))
-        }
+        ;['about', 'works', 'contact'].forEach(key => {
+          if (intersects[0].object.name == key) {
+            console.log(`onClick - menu:${key}`)
+            this.container.dispatchEvent(new Event(`click:${key}`))
+          }
+        })
       }
     }
   }
