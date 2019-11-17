@@ -24,7 +24,7 @@ export default class Slider {
       95,
       window.innerWidth / window.innerHeight,
       0.1,
-      this.isMobile ? 10000 : 6000
+      this.isMobile ? 10000 : 60000
     )
     this.insideCamera = new THREE.PerspectiveCamera(
       this.isMobile ? 95 : 75,
