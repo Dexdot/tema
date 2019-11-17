@@ -101,12 +101,17 @@ export default {
           targets: '.case__title span',
           duration: 800,
           easing: 'easeOutCubic',
-          translateY: ['100%', '0%']
+          translateY: ['100%', '0%'],
+          complete: () => {
+            this.slider.pause()
+          }
         })
       })
 
       // Case leave
       container.addEventListener('out:begin', () => {
+        this.slider.start()
+
         anime({
           targets: '.case__container',
           duration: 600,
@@ -125,6 +130,7 @@ export default {
       container.addEventListener('showmenu:begin', () => {
         this.$emit('toggle-menu', true)
       })
+
       container.addEventListener('hidemenu:complete', () => {
         this.$emit('toggle-menu', false)
       })

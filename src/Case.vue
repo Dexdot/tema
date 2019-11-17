@@ -20,13 +20,30 @@
         <div
           :class="[
             'case__img',
-            { 'case__img--full': img.fields.title.endsWith('--full') }
+            { 'case__img--full': item.fields.title.endsWith('--full') }
           ]"
-          v-for="img in content.images"
-          :key="img.sys.id"
-          ref="images"
+          v-for="item in content.images"
+          :key="item.sys.id"
         >
-          <img :src="img.fields.file.url" :alt="img.fields.title" />
+          <BaseImage
+            class="case__i"
+            v-if="isImage(item)"
+            @complete="onImgLoad"
+            :img="item"
+            :alt="item.fields.title"
+          />
+
+          <video
+            ref="videos"
+            class="case__i"
+            v-if="isVideo(item)"
+            :src="item.fields.file.url"
+            draggable="false"
+            autoplay
+            playsinline
+            loop
+            muted
+          />
         </div>
       </div>
     </div>
@@ -37,26 +54,33 @@
 
 <script>
 import Next from '@/Next'
+import BaseImage from '@/BaseImage'
 import { getCase } from '@/scripts/api'
+import { isImage, isVideo } from '@/scripts/helpers'
 
 export default {
   name: 'Case',
   components: {
+    BaseImage,
     Next
   },
   props: ['scroll'],
   data: () => ({
-    content: {}
+    content: {},
+    observer: {}
   }),
   async created() {
     this.content = await getCase(this, this.$route.params.id)
+    this.createObserver()
     this.$nextTick(() => {
-      this.observe()
+      this.$refs.videos.forEach(v => {
+        this.observer.observe(v.parentElement)
+      })
     })
   },
   methods: {
-    observe() {
-      const observer = new IntersectionObserver(
+    createObserver() {
+      this.observer = new IntersectionObserver(
         entries => {
           entries.forEach(({ target, isIntersecting }) => {
             if (isIntersecting) {
@@ -68,11 +92,12 @@ export default {
         },
         { threshold: [0, 0.5, 1] }
       )
-
-      this.$refs.images.forEach(img => {
-        observer.observe(img)
-      })
-    }
+    },
+    onImgLoad(img) {
+      this.observer.observe(img.parentElement)
+    },
+    isImage: item => isImage(item),
+    isVideo: item => isVideo(item)
   }
 }
 </script>
@@ -205,10 +230,10 @@ body.is-mob
   &:not(:last-child):not(.case__img--full)
     margin-bottom: 8.2vh
 
-  &, & img
+  &, .case__i
     will-change: transform
 
-  img
+  .case__i
     display: block
     max-width: 100%
     width: 100%
@@ -227,19 +252,19 @@ body.is-mob
   transform: scaleX(0.7) scaleY(0.7) scaleZ(1)
   transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)
 
-  img
+  .case__i
     transform: scaleX(1.5) scaleY(1.5) scaleZ(1)
     transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)
 
   &.visible,
-  &.visible img
+  &.visible .case__i
     transform: scaleX(1) scaleY(1) scaleZ(1)
 
 .case__img.case__img--full
-  img
+  .case__i
     transform: scaleX(1.5) scaleY(1.5) scaleZ(1)
     transition: transform 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)
 
-  &.visible img
+  &.visible .case__i
     transform: scaleX(1) scaleY(1) scaleZ(1)
 </style>
