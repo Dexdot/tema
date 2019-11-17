@@ -103,14 +103,14 @@ export default {
           easing: 'easeOutCubic',
           translateY: ['100%', '0%'],
           complete: () => {
-            this.slider.pause()
+            // this.slider.pause()
           }
         })
       })
 
       // Case leave
       container.addEventListener('out:begin', () => {
-        this.slider.start()
+        // this.slider.start()
 
         anime({
           targets: '.case__container',

@@ -9,10 +9,8 @@ export default THREE => {
     vertexShader: ` 
     varying vec2 vUv;
     void main() {
-
         vUv = uv;
         gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-
     }`,
 
     fragmentShader: `
@@ -25,7 +23,6 @@ export default THREE => {
         vec3 finalColor = mix(Fcolor, texel.rgb, opacity);
         gl_FragColor = vec4( finalColor, 1. );
     }
-
     `
   }
 

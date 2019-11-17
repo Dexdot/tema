@@ -1,6 +1,7 @@
 export default THREE => {
   THREE.OceanShader = {
     uniforms: {
+      //"map": { value: null },
       color: { value: new THREE.Color(0xffffff) },
       time: { type: 'f', value: 0 },
       opacity: { type: 'f', value: 1 },
@@ -11,7 +12,6 @@ export default THREE => {
     },
 
     vertexShader: `// Variable qualifiers that come with the shader
-
     varying vec2 vUv;
     // We passed this one
     uniform float time;

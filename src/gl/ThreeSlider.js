@@ -1,4 +1,6 @@
-import * as THREE from 'three'
+// import * as THREE from 'three'
+
+const THREE = window.THREE
 
 import FresnelShader from '@/gl/FresnelShader'
 import OceanShader from '@/gl/OceanShader'

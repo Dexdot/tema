@@ -73,9 +73,10 @@ export default {
     this.content = await getCase(this, this.$route.params.id)
     this.createObserver()
     this.$nextTick(() => {
-      this.$refs.videos.forEach(v => {
-        this.observer.observe(v.parentElement)
-      })
+      if (this.$refs.videos && this.$refs.videos.length > 0)
+        this.$refs.videos.forEach(v => {
+          this.observer.observe(v.parentElement)
+        })
     })
   },
   methods: {
