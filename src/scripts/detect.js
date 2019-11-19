@@ -37,3 +37,29 @@ export const isMACOS = () =>
 export const isFirefox = () => {
   return navigator.userAgent.toLowerCase().indexOf('firefox') > -1
 }
+
+export const detectDevices = () => {
+  const detect = {
+    isMACOS: isMACOS(),
+    isSafari: isSafari(),
+    isFirefox: isFirefox(),
+    isMobileDevice: isMobileDevice()
+  }
+
+  const body = document.querySelector('body')
+
+  if (detect.isMACOS) {
+    body.classList.add('is-macos')
+  }
+  if (detect.isSafari) {
+    body.classList.add('is-safari')
+  }
+  if (detect.isFirefox) {
+    body.classList.add('is-firefox')
+  }
+  if (detect.isMobileDevice) {
+    body.classList.add('is-mob')
+  }
+
+  return detect
+}

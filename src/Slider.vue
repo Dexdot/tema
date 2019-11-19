@@ -1,9 +1,6 @@
 <template>
   <section :class="['slider-container slider', { hidden: !show }]">
     <div class="slider" id="slider"></div>
-    <h1 class="slider-title">
-      <span ref="title">{{ title }}</span>
-    </h1>
 
     <div class="slider-counter" v-if="inited" v-show="$route.name === 'index'">
       <span>{{ num }}</span>
@@ -15,7 +12,7 @@
 
 <script>
 import anime from 'animejs'
-import loop from '@/scripts/loop'
+// import loop from '@/scripts/loop'
 
 import three from '@/gl/ThreeSlider'
 import Slider from '@/gl/Slider'
@@ -25,12 +22,11 @@ const images = {}
 
 export default {
   name: 'Slider',
-  props: ['scroll', 'detect', 'isMenuActive', 'show'],
+  props: ['detect', 'isMenuActive', 'show'],
   data: () => ({
     index: 0,
     inited: false,
-    slider: null,
-    title: ''
+    slider: null
   }),
   computed: {
     num() {
@@ -139,19 +135,6 @@ export default {
     }
   },
   watch: {
-    'scroll.counter'() {
-      if (!this.inited) return false
-
-      let dir = 'next'
-
-      if (this.detect.isSafari || this.detect.isMobileDevice) {
-        dir = this.scroll.direction === 1 ? 'next' : 'back'
-      } else {
-        dir = this.scroll.deltaY < 0 ? 'next' : 'back'
-      }
-
-      this.slider.indexControl(dir)
-    },
     show(show) {
       if (!this.inited) return false
 
