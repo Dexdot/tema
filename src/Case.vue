@@ -128,10 +128,10 @@ export default {
 
 .case__title
   +wood(m)
-  font-size: 96px
   +yo('font-size', (320px: 28px, 375px: 34px, 768px: 48px, 1440px: 72px, 1920px: 96px))
   text-align: center
   letter-spacing: 0.02em
+  color: #fff
 
   overflow: hidden
   transform: translate(-50%, -50%)

@@ -175,6 +175,7 @@ export default {
   line-height: 1
   font-size: 11px
   letter-spacing: 0.01em
+  color: #fff
 
   span:nth-child(2)
     background: #fff
