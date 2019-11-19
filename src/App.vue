@@ -1,13 +1,14 @@
 <template>
   <div id="app">
-    <Main :isMenuActive="isMenuActive" @btn-click="onMenuButtonClick" />
-    <!-- <Slider
+    <!-- <Main :isMenuActive="isMenuActive" @btn-click="onMenuButtonClick" /> -->
+    <Main :isMenuActive="isMenuActive" />
+    <Slider
       ref="scene"
       :show="showScene"
       :detect="detect"
       @toggle-menu="toggleMenu"
       @init="onSceneInit"
-    /> -->
+    />
 
     <div :class="['wrapper', { hidden: hideContent }]">
       <transition
@@ -29,14 +30,14 @@
 </template>
 
 <script>
-// import Slider from '@/Slider'
+import Slider from '@/Slider'
 import Main from '@/Main.vue'
 import { detectDevices } from '@/scripts/detect'
 
 export default {
   name: 'App',
   components: {
-    // Slider,
+    Slider,
     Main
   },
   data: () => ({
@@ -89,7 +90,7 @@ export default {
       }
     },
     async leave(el, done) {
-      if (this.isMenuActive) await this.$refs.scene.slider.hideMenu()
+      // if (this.isMenuActive) await this.$refs.scene.slider.hideMenu()
 
       const { name } = this.dir.from
       if (name === 'case' && this.sceneInited) {

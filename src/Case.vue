@@ -244,10 +244,10 @@ export default {
 
 
 // Case I/O animations
-// .case__container
-//   opacity: 0.6
-// .case__tttle span
-//   transform: translateY(100%)
+.case__container
+  opacity: 0
+.case__title span
+  transform: translateY(110%)
 
 // Image animations
 .case__img:not(.case__img--full)

@@ -1,5 +1,6 @@
 <template>
-  <section :class="['slider-container slider', { hidden: !show }]">
+  <!-- <section :class="['slider-container slider', { hidden: !show }]"> -->
+  <section class="slider-container slider">
     <div class="slider" id="slider"></div>
 
     <div class="slider-counter" v-if="inited" v-show="$route.name === 'index'">
@@ -14,7 +15,7 @@
 import anime from 'animejs'
 // import loop from '@/scripts/loop'
 
-import three from '@/gl/ThreeSlider'
+// import three from '@/gl/ThreeSlider'
 import Slider from '@/gl/Slider'
 import { getCases } from '@/scripts/api'
 
@@ -57,13 +58,12 @@ export default {
       const container = document.querySelector(selector)
 
       this.slider = new Slider({
-        initialSlug: this.$route.params.id,
-        selector,
+        container,
         images,
-        three
+        initialSlug: this.$route.params.id
       })
 
-      window.slider = this.slider
+      window.slider = this
 
       this.initEvents(container)
     },
@@ -97,19 +97,12 @@ export default {
           targets: '.case__title span',
           duration: 800,
           easing: 'easeOutCubic',
-          translateY: ['100%', '0%'],
-          complete: () => {
-            setTimeout(() => {
-              this.slider.pause()
-            }, 400)
-          }
+          translateY: ['100%', '0%']
         })
       })
 
       // Case leave
       container.addEventListener('out:begin', () => {
-        this.slider.start()
-
         anime({
           targets: '.case__container',
           duration: 600,
@@ -125,26 +118,26 @@ export default {
       })
 
       // Menu
-      container.addEventListener('showmenu:begin', () => {
-        this.$emit('toggle-menu', true)
-      })
+      // container.addEventListener('showmenu:begin', () => {
+      //   this.$emit('toggle-menu', true)
+      // })
 
-      container.addEventListener('hidemenu:complete', () => {
-        this.$emit('toggle-menu', false)
-      })
-    }
-  },
-  watch: {
-    show(show) {
-      if (!this.inited) return false
-
-      this.slider.pause()
-      if (show) {
-        if (loop.stopped) loop.start()
-        this.slider.start()
-      }
+      // container.addEventListener('hidemenu:complete', () => {
+      //   this.$emit('toggle-menu', false)
+      // })
     }
   }
+  // watch: {
+  //   show(show) {
+  //     if (!this.inited) return false
+
+  //     this.slider.pause()
+  //     if (show) {
+  //       if (loop.stopped) loop.start()
+  //       this.slider.start()
+  //     }
+  //   }
+  // }
 }
 </script>
 
