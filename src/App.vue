@@ -4,9 +4,9 @@
     <Main :isMenuActive="isMenuActive" />
     <Slider
       ref="scene"
-      :show="showScene"
       :detect="detect"
-      @toggle-menu="toggleMenu"
+      @show-menu="toggleMenu(true)"
+      @hide-menu="toggleMenu(false)"
       @init="onSceneInit"
     />
 
@@ -50,11 +50,6 @@ export default {
   computed: {
     hideContent() {
       return this.$route.name === 'index' ? false : this.isMenuActive
-    },
-    showScene() {
-      return this.sceneInited
-        ? ['index', 'case'].includes(this.$route.name)
-        : false
     }
   },
   mounted() {
@@ -91,7 +86,6 @@ export default {
     },
     async leave(el, done) {
       // if (this.isMenuActive) await this.$refs.scene.slider.hideMenu()
-
       const { name } = this.dir.from
       if (name === 'case' && this.sceneInited) {
         await this.$refs.scene.slider.out()
@@ -121,8 +115,8 @@ body
     &:focus
       color: #fff
 
-// body.is-macos:not(.is-safari)
-//   overflow: hidden
+body:not(.scrollable)
+  overflow: hidden
 </style>
 
 <style lang="sass" scoped>

@@ -1,5 +1,4 @@
 <template>
-  <!-- <section :class="['slider-container slider', { hidden: !show }]"> -->
   <section class="slider-container slider">
     <div class="slider" id="slider"></div>
 
@@ -13,9 +12,6 @@
 
 <script>
 import anime from 'animejs'
-// import loop from '@/scripts/loop'
-
-// import three from '@/gl/ThreeSlider'
 import Slider from '@/gl/Slider'
 import { getCases } from '@/scripts/api'
 
@@ -23,7 +19,7 @@ const images = {}
 
 export default {
   name: 'Slider',
-  props: ['detect', 'isMenuActive', 'show'],
+  props: ['detect', 'isMenuActive'],
   data: () => ({
     index: 0,
     inited: false,
@@ -97,12 +93,19 @@ export default {
           targets: '.case__title span',
           duration: 800,
           easing: 'easeOutCubic',
-          translateY: ['100%', '0%']
+          translateY: ['100%', '0%'],
+          complete: () => {
+            setTimeout(() => {
+              document.body.classList.add('scrollable')
+            }, 200)
+          }
         })
       })
 
       // Case leave
       container.addEventListener('out:begin', () => {
+        document.body.classList.remove('scrollable')
+
         anime({
           targets: '.case__container',
           duration: 600,
@@ -118,26 +121,15 @@ export default {
       })
 
       // Menu
-      // container.addEventListener('showmenu:begin', () => {
-      //   this.$emit('toggle-menu', true)
-      // })
+      container.addEventListener('showmenu:begin', () => {
+        this.$emit('show-menu', true)
+      })
 
-      // container.addEventListener('hidemenu:complete', () => {
-      //   this.$emit('toggle-menu', false)
-      // })
+      container.addEventListener('hidemenu:complete', () => {
+        this.$emit('hide-menu', false)
+      })
     }
   }
-  // watch: {
-  //   show(show) {
-  //     if (!this.inited) return false
-
-  //     this.slider.pause()
-  //     if (show) {
-  //       if (loop.stopped) loop.start()
-  //       this.slider.start()
-  //     }
-  //   }
-  // }
 }
 </script>
 

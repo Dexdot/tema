@@ -6,7 +6,7 @@ export default class Slider {
   constructor({ container, images, initialSlug }) {
     this.container = container
     this.images = images
-    this.initialSlug = initialSlug;
+    this.initialSlug = initialSlug
 
     this.isMobileSafari = isMobileSafari()
     this.scene = new THREE.Scene()
@@ -398,90 +398,6 @@ export default class Slider {
     this.recompileShader(this.arrB[this.index + 1], 20)
     this.recompileShader(this.arrB[this.index - 1], 20)
 
-    document.addEventListener('keydown', event => {
-      if (!this.moving && event.key == ' ') {
-        this.moving = true
-
-        if (!this.inMenu) {
-          let newPos = new THREE.Vector3(
-            this.camera.position.x,
-            this.camera.position.y,
-            this.camera.position.z
-          )
-          newPos.x *= 1.1
-          newPos.z *= 1.1
-          this.TGroup.position.set(newPos.x, 500, newPos.z)
-          let tmpControlBezier =
-            this.index + 1 > this.arrOrbits.length - 1
-              ? this.arrB[0].position
-              : this.arrB[this.index + 1].position
-          let tmpfloat = { value: 0 }
-          let focusBezier = new THREE.QuadraticBezierCurve3(
-            new THREE.Vector3(),
-            tmpControlBezier,
-            this.TGroup.position
-          )
-          this.TGroup.visible = true
-          this.about.material.uniforms.color.value = new THREE.Color(0xffffff)
-          this.works.material.uniforms.color.value = new THREE.Color(0xcbcbcb)
-          this.contact.material.uniforms.color.value = new THREE.Color(0xcbcbcb)
-
-          TweenMax.to(tmpfloat, 2, {
-            value: 1,
-            ease: Power2.easeOut,
-            onUpdate: () => {
-              this.focus.set(
-                focusBezier.getPointAt(tmpfloat.value).x,
-                focusBezier.getPointAt(tmpfloat.value).y,
-                focusBezier.getPointAt(tmpfloat.value).z
-              )
-            },
-            onComplete: () => {
-              this.inMenu = true
-              this.moving = false
-              for (let i = 0; i < this.arrB.length; i++) {
-                this.arrB[i].visible = false
-              }
-            }
-          })
-        } else {
-          let tmpControlBezier =
-            this.index + 1 > this.arrOrbits.length - 1
-              ? this.arrB[0].position
-              : this.arrB[this.index + 1].position
-          let tmpfloat = { value: 0 }
-          let focusBezier = new THREE.QuadraticBezierCurve3(
-            this.TGroup.position,
-            tmpControlBezier,
-            new THREE.Vector3()
-          )
-          if (this.adaptMode) {
-            this.arrB[this.index].visible = true
-          } else {
-            for (let i = 0; i < this.arrB.length; i++) {
-              this.arrB[i].visible = true
-            }
-          }
-
-          TweenMax.to(tmpfloat, 2, {
-            value: 1,
-            ease: Power2.easeInOut,
-            onUpdate: () => {
-              this.focus.set(
-                focusBezier.getPointAt(tmpfloat.value).x,
-                focusBezier.getPointAt(tmpfloat.value).y,
-                focusBezier.getPointAt(tmpfloat.value).z
-              )
-            },
-            onComplete: () => {
-              this.TGroup.visible = false
-              this.inMenu = false
-              this.moving = false
-            }
-          })
-        }
-      }
-    })
     document.querySelector('.slider-container').appendChild(this.d)
 
     this.light = new THREE.PointLight(0xff0000, 0.8, 500)
@@ -590,102 +506,6 @@ export default class Slider {
               /*СВАЙП ВПРАВО*/
               this.indexControl('next')
             }
-          } else {
-            if (this.finalPoint.pageY < this.initialPoint.pageY) {
-              if (!this.moving) {
-                this.moving = true
-                if (!this.inMenu) {
-                  let newPos = new THREE.Vector3(
-                    this.camera.position.x,
-                    this.camera.position.y,
-                    this.camera.position.z
-                  )
-                  newPos.x *= 1.1
-                  newPos.z *= 1.1
-                  this.TGroup.position.set(newPos.x, 500, newPos.z)
-                  let tmpControlBezier =
-                    this.index + 1 > this.arrOrbits.length - 1
-                      ? this.arrB[0].position
-                      : this.arrB[this.index + 1].position
-                  let tmpfloat = { value: 0 }
-                  let focusBezier = new THREE.QuadraticBezierCurve3(
-                    new THREE.Vector3(),
-                    tmpControlBezier,
-                    this.TGroup.position
-                  )
-                  this.TGroup.visible = true
-                  this.about.material.uniforms.color.value = new THREE.Color(
-                    0xffffff
-                  )
-                  this.works.material.uniforms.color.value = new THREE.Color(
-                    0xcbcbcb
-                  )
-                  this.contact.material.uniforms.color.value = new THREE.Color(
-                    0xcbcbcb
-                  )
-
-                  TweenMax.to(tmpfloat, 2, {
-                    value: 1,
-                    ease: Power2.easeOut,
-                    onUpdate: () => {
-                      this.focus.set(
-                        focusBezier.getPointAt(tmpfloat.value).x,
-                        focusBezier.getPointAt(tmpfloat.value).y,
-                        focusBezier.getPointAt(tmpfloat.value).z
-                      )
-                    },
-                    onComplete: () => {
-                      this.inMenu = true
-                      this.moving = false
-                      for (let i = 0; i < this.arrB.length; i++) {
-                        this.arrB[i].visible = false
-                      }
-                    }
-                  })
-                } else {
-                  let tmpControlBezier =
-                    this.index + 1 > this.arrOrbits.length - 1
-                      ? this.arrB[0].position
-                      : this.arrB[this.index + 1].position
-                  let tmpfloat = { value: 0 }
-                  let focusBezier = new THREE.QuadraticBezierCurve3(
-                    this.TGroup.position,
-                    tmpControlBezier,
-                    new THREE.Vector3()
-                  )
-                  if (this.adaptMode) {
-                    this.arrB[this.index].visible = true
-                  } else {
-                    for (let i = 0; i < this.arrB.length; i++) {
-                      this.arrB[i].visible = true
-                    }
-                  }
-
-                  TweenMax.to(tmpfloat, 2, {
-                    value: 1,
-                    ease: Power2.easeInOut,
-                    onUpdate: () => {
-                      this.focus.set(
-                        focusBezier.getPointAt(tmpfloat.value).x,
-                        focusBezier.getPointAt(tmpfloat.value).y,
-                        focusBezier.getPointAt(tmpfloat.value).z
-                      )
-                    },
-                    onComplete: () => {
-                      this.TGroup.visible = false
-                      this.inMenu = false
-                      this.moving = false
-                      //this.oceanText.position.set(this.camera.position.x*0.98,300,this.camera.position.z*0.98)
-                    }
-                  })
-                }
-              }
-              //this.indexControl('next');
-              /*СВАЙП ВВЕРХ*/
-            } else {
-              //this.indexControl('back');
-              /*СВАЙП ВНИЗ*/
-            }
           }
         } else {
           event.target.click()
@@ -713,6 +533,97 @@ export default class Slider {
     this.container.dispatchEvent(new Event('init:complete'))
     this.animate()
   }
+
+  showMenu() {
+    new Promise(resolve => {
+      this.moving = true
+
+      let newPos = new THREE.Vector3(
+        this.camera.position.x,
+        this.camera.position.y,
+        this.camera.position.z
+      )
+      newPos.x *= 1.1
+      newPos.z *= 1.1
+      this.TGroup.position.set(newPos.x, 500, newPos.z)
+      let tmpControlBezier =
+        this.index + 1 > this.arrOrbits.length - 1
+          ? this.arrB[0].position
+          : this.arrB[this.index + 1].position
+      let tmpfloat = { value: 0 }
+      let focusBezier = new THREE.QuadraticBezierCurve3(
+        new THREE.Vector3(),
+        tmpControlBezier,
+        this.TGroup.position
+      )
+      this.TGroup.visible = true
+      this.about.material.uniforms.color.value = new THREE.Color(0xffffff)
+      this.works.material.uniforms.color.value = new THREE.Color(0xcbcbcb)
+      this.contact.material.uniforms.color.value = new THREE.Color(0xcbcbcb)
+
+      TweenMax.to(tmpfloat, 2, {
+        value: 1,
+        ease: Power2.easeOut,
+        onUpdate: () => {
+          this.focus.set(
+            focusBezier.getPointAt(tmpfloat.value).x,
+            focusBezier.getPointAt(tmpfloat.value).y,
+            focusBezier.getPointAt(tmpfloat.value).z
+          )
+        },
+        onComplete: () => {
+          this.inMenu = true
+          this.moving = false
+          for (let i = 0; i < this.arrB.length; i++) {
+            this.arrB[i].visible = false
+          }
+          resolve()
+        }
+      })
+    })
+  }
+
+  hideMenu() {
+    new Promise(resolve => {
+      this.moving = true
+      let tmpControlBezier =
+        this.index + 1 > this.arrOrbits.length - 1
+          ? this.arrB[0].position
+          : this.arrB[this.index + 1].position
+      let tmpfloat = { value: 0 }
+      let focusBezier = new THREE.QuadraticBezierCurve3(
+        this.TGroup.position,
+        tmpControlBezier,
+        new THREE.Vector3()
+      )
+      if (this.adaptMode) {
+        this.arrB[this.index].visible = true
+      } else {
+        for (let i = 0; i < this.arrB.length; i++) {
+          this.arrB[i].visible = true
+        }
+      }
+
+      TweenMax.to(tmpfloat, 2, {
+        value: 1,
+        ease: Power2.easeInOut,
+        onUpdate: () => {
+          this.focus.set(
+            focusBezier.getPointAt(tmpfloat.value).x,
+            focusBezier.getPointAt(tmpfloat.value).y,
+            focusBezier.getPointAt(tmpfloat.value).z
+          )
+        },
+        onComplete: () => {
+          this.TGroup.visible = false
+          this.inMenu = false
+          this.moving = false
+          resolve()
+        }
+      })
+    })
+  }
+
   adapt() {
     if (window.innerWidth <= 1024) {
       this.adaptMode = true
@@ -911,6 +822,7 @@ export default class Slider {
         const paramsArray = Object.values(this.sceneParams)
         const active = paramsArray.find(e => e.slug === this.initialSlug)
         this.index = paramsArray.indexOf(active)
+        this.prepare(this.index)
       }
 
       this.moving = true
@@ -1045,7 +957,6 @@ export default class Slider {
         this.last.material.uuid != intersects[0].object.material.uuid &&
         intersects[0].object.name != 'inside'
       ) {
-        console.log('y2')
         TweenMax.to(this.last.material.uniforms.dispersion, 2, {
           value: 0.8,
           ease: Power2.easeInOut
@@ -1151,11 +1062,9 @@ export default class Slider {
         if (!this.moving && this.newTime - this.oldTime > 550) {
           if (direction < 0) {
             // swipe down
-            console.log('touchpad_next')
             this.indexControl('next')
           } else {
             // swipe up
-            console.log('touchpad_back')
             this.indexControl('back')
           }
           setTimeout(function() {
@@ -1164,18 +1073,113 @@ export default class Slider {
         }
       } else {
         if (direction < 0) {
-          console.log('Ntouchpad_next')
           this.indexControl('next')
 
           // swipe down
         } else {
           // swipe up
-          console.log('Ntouchpad_back')
           this.indexControl('back')
         }
       }
     }
     //}
+  }
+
+  prepare(i) {
+    let floatIndex = { value: 0 }
+    let materialChanged = false
+
+    this.moving = true
+
+    const ev = new CustomEvent('index:changed', {
+      detail: { i }
+    })
+    this.container.dispatchEvent(ev)
+
+    let curve = new THREE.QuadraticBezierCurve3(
+      new THREE.Vector3(
+        this.camera.position.x,
+        this.camera.position.y,
+        this.camera.position.z
+      ),
+      this.arrCurves[i],
+      new THREE.Vector3(
+        this.arrOrbits[i].getPointAt(0.5).x,
+        this.arrOrbits[i].getPointAt(0.5).y,
+        this.arrOrbits[i].getPointAt(0.5).z
+      )
+    )
+    TweenMax.set(this.oceanText.material.uniforms.opacity, {
+      value: 0
+    })
+    this.generateGeometry(i)
+
+    this.arrB[i].visible = true
+
+    TweenMax.set(floatIndex, {
+      ease: Power2.easeInOut,
+      value: 1
+    })
+
+    this.camera.lookAt(this.scene.position)
+    this.camera.position.set(
+      curve.getPointAt(floatIndex.value).x,
+      curve.getPointAt(floatIndex.value).y,
+      curve.getPointAt(floatIndex.value).z
+    )
+    this.camera.lookAt(this.scene.position)
+
+    this.index = i
+    this.moving = false
+    this.Cgroup.position.set(
+      this.camera.position.x * this.distanceScale,
+      300,
+      this.camera.position.z * this.distanceScale
+    )
+
+    TweenMax.set(this.oceanText.material.uniforms.opacity, {
+      value: 1
+    })
+
+    if (this.adaptMode) {
+      for (let j = 0; j < this.arrB.length; j++) {
+        if (j != this.index) {
+          this.arrB[j].visible = false
+        }
+      }
+    }
+
+    if (!materialChanged) {
+      for (let j = 0; j < this.arrB.length; j++) {
+        if (j != this.arrB.length - 1) {
+          this.recompileShader(this.arrB[j], 20)
+          TweenMax.set(
+            this.arrB[j].material.uniforms.dispersionBlendMultiplier,
+            { value: 1 }
+          )
+        }
+      }
+
+      this.recompileShader(this.arrB[this.arrB.length - 1], 50)
+      this.recompileShader(this.arrB[0], 30)
+      this.recompileShader(this.arrB[this.arrB.length - 2], 30)
+
+      TweenMax.set(this.arrB[i].material.uniforms.dispersionBlendMultiplier, {
+        value: 4
+      })
+
+      TweenMax.set(this.arrB[0].material.uniforms.dispersionBlendMultiplier, {
+        value: 1.5
+      })
+
+      TweenMax.set(
+        this.arrB[this.arrB.length - 2].material.uniforms
+          .dispersionBlendMultiplier,
+        { value: 1.5 }
+      )
+
+      materialChanged = true
+    }
   }
 
   indexControl(direction) {
@@ -1193,6 +1197,7 @@ export default class Slider {
       if (direction == 'next' && this.index < this.arrOrbits.length - 1) {
         this.moving = true
         dispatch(this.index + 1)
+
         let curve = new THREE.QuadraticBezierCurve3(
           new THREE.Vector3(
             this.camera.position.x,
@@ -1305,6 +1310,7 @@ export default class Slider {
           materialChanged = true
         }
       }
+
       if (direction == 'back' && this.index > 0) {
         this.moving = true
         dispatch(this.index - 1)
