@@ -126,6 +126,9 @@ export default {
 //       top: 50%
 //       left: 50%
 
+body.is-mob .case__fixed
+  top: calc(var(--initial-vh) * 50)
+
 .case__title
   +wood(m)
   +yo('font-size', (320px: 28px, 375px: 34px, 768px: 48px, 1440px: 72px, 1920px: 96px))

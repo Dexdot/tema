@@ -119,15 +119,6 @@ export default {
           translateY: ['0%', '-100%']
         })
       })
-
-      // Menu
-      container.addEventListener('showmenu:begin', () => {
-        this.$emit('show-menu', true)
-      })
-
-      container.addEventListener('hidemenu:complete', () => {
-        this.$emit('hide-menu', false)
-      })
     }
   }
 }

@@ -1,8 +1,6 @@
 <template>
   <transition name="menu">
     <section class="menu" v-show="active">
-      <!-- <div class="menu__overlay"></div> -->
-
       <nav class="menu__nav" @click="$emit('click')">
         <ul>
           <li>

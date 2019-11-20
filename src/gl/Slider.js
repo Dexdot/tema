@@ -821,7 +821,10 @@ export default class Slider {
       if (prepare) {
         const paramsArray = Object.values(this.sceneParams)
         const active = paramsArray.find(e => e.slug === this.initialSlug)
+        console.log('active', active)
+
         this.index = paramsArray.indexOf(active)
+        console.log('index', this.index)
         this.prepare(this.index)
       }
 

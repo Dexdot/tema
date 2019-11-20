@@ -1,14 +1,7 @@
 <template>
   <div id="app">
-    <!-- <Main :isMenuActive="isMenuActive" @btn-click="onMenuButtonClick" /> -->
-    <Main :isMenuActive="isMenuActive" />
-    <Slider
-      ref="scene"
-      :detect="detect"
-      @show-menu="toggleMenu(true)"
-      @hide-menu="toggleMenu(false)"
-      @init="onSceneInit"
-    />
+    <Main :isMenuActive="isMenuActive" @btn-click="onMenuButtonClick" />
+    <Slider ref="scene" :detect="detect" @init="onSceneInit" />
 
     <div :class="['wrapper', { hidden: hideContent }]">
       <transition
@@ -64,15 +57,32 @@ export default {
       this.sceneInited = true
       if (this.$route.name === 'case') this.$refs.scene.slider.enter(true)
     },
-    onMenuButtonClick(showMenu) {
-      if (showMenu) {
-        this.$refs.scene.slider.showMenu()
-      } else {
-        this.$refs.scene.slider.hideMenu()
-      }
+    showMenu() {
+      new Promise(async resolve => {
+        if (this.isMenuActive) return false
+
+        this.isMenuActive = true
+        await this.$refs.scene.slider.showMenu()
+        resolve()
+      })
     },
-    toggleMenu(v) {
-      this.isMenuActive = v
+    hideMenu() {
+      new Promise(async resolve => {
+        if (!this.isMenuActive) return false
+
+        await this.$refs.scene.slider.hideMenu()
+        this.isMenuActive = false
+        resolve()
+      })
+    },
+    onMenuButtonClick(showMenu) {
+      if (this.$route.name !== 'index') return false
+
+      if (showMenu) {
+        this.showMenu()
+      } else {
+        this.hideMenu()
+      }
     },
     async enter(el, done) {
       const { name } = this.dir.to
@@ -85,7 +95,8 @@ export default {
       }
     },
     async leave(el, done) {
-      // if (this.isMenuActive) await this.$refs.scene.slider.hideMenu()
+      if (this.isMenuActive) await this.hideMenu()
+
       const { name } = this.dir.from
       if (name === 'case' && this.sceneInited) {
         await this.$refs.scene.slider.out()
