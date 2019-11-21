@@ -97,6 +97,7 @@ export default {
           complete: () => {
             setTimeout(() => {
               document.body.classList.add('scrollable')
+              this.slider.pause()
             }, 200)
           }
         })
@@ -105,6 +106,7 @@ export default {
       // Case leave
       container.addEventListener('out:begin', () => {
         document.body.classList.remove('scrollable')
+        if (!this.slider.RAF) this.slider.play()
 
         anime({
           targets: '.case__container',
