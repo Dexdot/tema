@@ -38,7 +38,7 @@ export default class Slider {
         60000
       ) //75
       this.insideCamera = new THREE.PerspectiveCamera(
-        75,
+        95,
         window.innerWidth / window.innerHeight,
         0.1,
         10000
@@ -397,9 +397,9 @@ export default class Slider {
       uniforms: THREE.DispersionMaterial.uniforms,
       side: THREE.DoubleSide,
       vertexShader: THREE.DispersionMaterial.vertex_Shader,
-
       fragmentShader: THREE.DispersionMaterial.fragmentShader
     })
+
     this.insideSphere = new THREE.Mesh(this.bigtestgeometry, this.material)
     this.insideSphere.visible = false
     this.insideSphere.name = 'inside'
@@ -410,6 +410,38 @@ export default class Slider {
     this.recompileShader(this.arrB[this.index - 1], 20)
 
     document.querySelector('.slider-container').appendChild(this.d)
+
+    for (let i = 0; i < 7; i++) {
+      this.arrB[
+        i
+      ].material.uniforms.uWiggleScale.value = this.settings.uWiggleScale
+      this.arrB[
+        i
+      ].material.uniforms.uWiggleDisplacement.value = this.settings.uWiggleDisplacement
+      this.arrB[
+        i
+      ].material.uniforms.uWiggleSpeed.value = this.settings.uWiggleSpeed
+
+      this.arrB[
+        i
+      ].material.uniforms.mRefractionRatio.value = this.settings.mRefractionRatio
+      this.arrB[
+        i
+      ].material.uniforms.mFresnelBias.value = this.settings.mFresnelBias
+      this.arrB[
+        i
+      ].material.uniforms.mFresnelPower.value = this.settings.mFresnelPower
+      this.arrB[
+        i
+      ].material.uniforms.mFresnelScale.value = this.settings.mFresnelScale
+      this.arrB[
+        i
+      ].material.uniforms.refractionRatio.value = this.settings.refractionRatio
+      this.arrB[i].material.uniforms.dispersion.value = this.settings.dispersion
+      this.arrB[
+        i
+      ].material.uniforms.dispersionBlendMultiplier.value = this.settings.dispersionBlendMultiplier
+    }
 
     this.light = new THREE.PointLight(0xff0000, 0.8, 500)
     this.light.position.set(
@@ -533,6 +565,18 @@ export default class Slider {
             } else {
               /*СВАЙП ВПРАВО*/
               this.indexControl('next')
+            }
+          } else {
+            //
+            if (
+              !this.moving &&
+              this.finalPoint.pageY < this.initialPoint.pageY
+            ) {
+              if (!this.inMenu) {
+                this.showMenu()
+              } else {
+                this.hideMenu()
+              }
             }
           }
         } else {
@@ -680,13 +724,6 @@ export default class Slider {
           ? new THREE.Vector3(350, 20, 0)
           : new THREE.Vector3()
       )
-      if (this.adaptMode) {
-        this.arrB[this.index].visible = true
-      } else {
-        for (let i = 0; i < this.arrB.length; i++) {
-          this.arrB[i].visible = true
-        }
-      }
 
       TweenMax.to(tmpfloat, 2, {
         value: 1,
@@ -873,11 +910,6 @@ export default class Slider {
         }
       }
     } else {
-      this.raycaster.setFromCamera(
-        this.mouse,
-        this.insideSphere.visible ? this.insideCamera : this.camera
-      )
-
       let intersects = this.raycaster.intersectObjects(this.TGroup.children)
 
       if (intersects.length > 0) {

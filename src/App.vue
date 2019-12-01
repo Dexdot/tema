@@ -76,7 +76,7 @@ export default {
       })
     },
     onMenuButtonClick(showMenu) {
-      if (this.$route.name !== 'index') return false
+      // if (this.$route.name !== 'index') return false
 
       if (showMenu) {
         this.showMenu()
