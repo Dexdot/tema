@@ -611,6 +611,8 @@ export default class Slider {
     new Promise(resolve => {
       this.moving = true
 
+      console.log(this)
+
       let newPos
       if (!this.insideSphere.visible) {
         newPos = new THREE.Vector3(

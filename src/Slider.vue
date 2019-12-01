@@ -97,7 +97,7 @@ export default {
           complete: () => {
             setTimeout(() => {
               document.body.classList.add('scrollable')
-              this.slider.pause()
+              // this.slider.pause()
             }, 200)
           }
         })
