@@ -153,17 +153,6 @@ export default class Slider {
 
     if (!this.insideSphere.visible) {
       this.time += this.fovard
-      if (!this.menuTime.about) {
-        this.about.material.uniforms.time.value += 0.025
-      }
-
-      if (!this.menuTime.works) {
-        this.works.material.uniforms.time.value += 0.025
-      }
-
-      if (!this.menuTime.contact) {
-        this.contact.material.uniforms.time.value += 0.025
-      }
 
       if (this.time > 24.5 || this.time < 17) {
         this.fovard *= -1
@@ -176,6 +165,18 @@ export default class Slider {
       this.TGroup.lookAt(this.insideCamera.position)
       this.insideSphere.material.uniforms.time.value = this.time
       this.renderer.render(this.scene, this.insideCamera)
+    }
+
+    if (!this.menuTime.about) {
+      this.about.material.uniforms.time.value += 0.025
+    }
+
+    if (!this.menuTime.works) {
+      this.works.material.uniforms.time.value += 0.025
+    }
+
+    if (!this.menuTime.contact) {
+      this.contact.material.uniforms.time.value += 0.025
     }
 
     for (let i = 0; i < 7; i++) {
@@ -910,6 +911,11 @@ export default class Slider {
         }
       }
     } else {
+      this.raycaster.setFromCamera(
+        this.mouse,
+        this.insideSphere.visible ? this.insideCamera : this.camera
+      )
+
       let intersects = this.raycaster.intersectObjects(this.TGroup.children)
 
       if (intersects.length > 0) {
