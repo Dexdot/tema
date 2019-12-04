@@ -1,9 +1,6 @@
 <template>
   <article class="case">
-    <div
-      class="case__fixed"
-      :style="{ transform: `translate3d(0, ${this.scroll.translate}px, 0)` }"
-    >
+    <div class="case__fixed">
       <h1 class="case__title">
         <span>{{ content.title }}</span>
       </h1>
@@ -64,7 +61,6 @@ export default {
     BaseImage,
     Next
   },
-  props: ['scroll'],
   data: () => ({
     content: {},
     observer: {}
@@ -115,34 +111,36 @@ export default {
   top: 50vh
   left: 50%
 
-body.is-safari,
-body.is-mob
-  .case__fixed
-    position: fixed
-    top: 0
-    left: 0
-    transform: unset !important
-    width: 100vw
-    height: 100vh
+// body.is-safari,
+// body.is-mob
+//   .case__fixed
+//     position: fixed
+//     top: 0
+//     left: 0
+//     transform: unset !important
+//     width: 100vw
+//     height: 100vh
 
-    .case__title
-      position: absolute
-      top: 50%
-      left: 50%
+//     .case__title
+//       position: absolute
+//       top: 50%
+//       left: 50%
+
+body.is-mob .case__fixed
+  top: calc(var(--initial-vh) * 50)
 
 .case__title
   +wood(m)
-  font-size: 96px
   +yo('font-size', (320px: 28px, 375px: 34px, 768px: 48px, 1440px: 72px, 1920px: 96px))
   text-align: center
   letter-spacing: 0.02em
+  color: #fff
 
   overflow: hidden
   transform: translate(-50%, -50%)
 
   span
     display: block
-    transform: translateY(110%)
 
 .case__caption
   position: relative
@@ -187,8 +185,6 @@ body.is-mob
   width: 75.8vw
 
   position: relative
-
-  opacity: 0
 
   @media (max-width: 800px)
     width: 80vw
@@ -249,6 +245,14 @@ body.is-mob
     width: 80vw
     margin-left: -8vw
 
+
+// Case I/O animations
+.case__container
+  opacity: 0
+.case__title span
+  transform: translateY(110%)
+
+// Image animations
 .case__img:not(.case__img--full)
   transform: scaleX(0.7) scaleY(0.7) scaleZ(1)
   transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)

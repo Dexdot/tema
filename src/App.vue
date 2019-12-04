@@ -1,74 +1,55 @@
 <template>
   <div id="app">
     <Main :isMenuActive="isMenuActive" @btn-click="onMenuButtonClick" />
-    <Slider
-      ref="scene"
-      :show="showScene"
-      :scroll="$refs.scroll && $refs.scroll.scroll"
-      :detect="$refs.scroll && $refs.scroll.detect"
-      @toggle-menu="toggleMenu"
-      @init="onSceneInit"
-    />
+    <Slider ref="scene" :detect="detect" @init="onSceneInit" />
 
-    <div :class="['scroll', { hidden: hideContent }]">
-      <Scroll ref="scroll">
-        <transition
-          v-if="mounted"
-          @enter="enter"
-          @leave="leave"
-          :css="false"
-          mode="out-in"
-        >
-          <router-view
-            ref="view"
-            :key="$route.path"
-            :scroll="$refs.scroll && $refs.scroll.scroll"
-            :detect="$refs.scroll && $refs.scroll.detect"
-            :isMenuActive="isMenuActive"
-            @disable-scroll="disableScroll"
-          />
-        </transition>
-      </Scroll>
+    <div :class="['wrapper', { hidden: hideContent }]">
+      <transition
+        v-if="mounted"
+        @enter="enter"
+        @leave="leave"
+        :css="false"
+        mode="out-in"
+      >
+        <router-view
+          ref="view"
+          :key="$route.path"
+          :detect="detect"
+          :isMenuActive="isMenuActive"
+        />
+      </transition>
     </div>
   </div>
 </template>
 
 <script>
-import Slider from '@/Slider.vue'
+import Slider from '@/Slider'
 import Main from '@/Main.vue'
-import Scroll from '@/Scroll'
-import { isFirefox } from '@/scripts/detect'
+import { detectDevices } from '@/scripts/detect'
 
 export default {
   name: 'App',
   components: {
     Slider,
-    Main,
-    Scroll
+    Main
   },
   data: () => ({
     sceneInited: false,
     mounted: false,
     isMenuActive: false,
-    dir: {}
+    dir: {},
+    detect: {}
   }),
   computed: {
     hideContent() {
       return this.$route.name === 'index' ? false : this.isMenuActive
-    },
-    showScene() {
-      return this.sceneInited
-        ? ['index', 'case'].includes(this.$route.name)
-        : false
     }
   },
   mounted() {
     this.$nextTick(() => {
       this.mounted = true
 
-      if (isFirefox()) {
-        document.body.classList.add('is-firefox')
-      }
+      detectDevices()
     })
   },
   methods: {
@@ -76,23 +57,32 @@ export default {
       this.sceneInited = true
       if (this.$route.name === 'case') this.$refs.scene.slider.enter(true)
     },
+    showMenu() {
+      new Promise(async resolve => {
+        if (this.isMenuActive) return false
+
+        this.isMenuActive = true
+        await this.$refs.scene.slider.showMenu()
+        resolve()
+      })
+    },
+    hideMenu() {
+      new Promise(async resolve => {
+        if (!this.isMenuActive) return false
+
+        await this.$refs.scene.slider.hideMenu()
+        this.isMenuActive = false
+        resolve()
+      })
+    },
     onMenuButtonClick(showMenu) {
+      // if (this.$route.name !== 'index') return false
+
       if (showMenu) {
-        this.$refs.scene.slider.showMenu()
+        this.showMenu()
       } else {
-        this.$refs.scene.slider.hideMenu()
+        this.hideMenu()
       }
-    },
-    disableScroll(v) {
-      this.$refs.scroll.scroll.disable = v
-    },
-    toggleMenu(v) {
-      this.isMenuActive = v
-    },
-    resetScroll() {
-      this.$refs.scroll.scroll.val = 0
-      this.$refs.scroll.scroll.translate = 0
-      window.scrollTo(0, 0)
     },
     async enter(el, done) {
       const { name } = this.dir.to
@@ -103,22 +93,17 @@ export default {
       } else {
         done()
       }
-      this.disableScroll(false)
     },
     async leave(el, done) {
-      if (this.isMenuActive) await this.$refs.scene.slider.hideMenu()
+      if (this.isMenuActive) await this.hideMenu()
 
       const { name } = this.dir.from
       if (name === 'case' && this.sceneInited) {
         await this.$refs.scene.slider.out()
-        this.resetScroll()
         done()
       } else {
-        this.resetScroll()
         done()
       }
-
-      this.disableScroll(true)
     }
   },
   watch: {
@@ -141,20 +126,12 @@ body
     &:focus
       color: #fff
 
-body.is-macos:not(.is-safari)
+body:not(.scrollable)
   overflow: hidden
-
-body.is-safari,
-body.is-mob
-  .scroll-container
-    overflow: unset !important
-    height: auto !important
-  .scroll-inner
-    transform: unset !important
 </style>
 
 <style lang="sass" scoped>
-.scroll
+.wrapper
   transition: opacity 0.25s ease
   &.hidden
     opacity: 0

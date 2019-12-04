@@ -1,9 +1,6 @@
 <template>
-  <section :class="['slider-container slider', { hidden: !show }]">
+  <section class="slider-container slider">
     <div class="slider" id="slider"></div>
-    <h1 class="slider-title">
-      <span ref="title">{{ title }}</span>
-    </h1>
 
     <div class="slider-counter" v-if="inited" v-show="$route.name === 'index'">
       <span>{{ num }}</span>
@@ -15,9 +12,6 @@
 
 <script>
 import anime from 'animejs'
-import loop from '@/scripts/loop'
-
-import three from '@/gl/ThreeSlider'
 import Slider from '@/gl/Slider'
 import { getCases } from '@/scripts/api'
 
@@ -25,12 +19,11 @@ const images = {}
 
 export default {
   name: 'Slider',
-  props: ['scroll', 'detect', 'isMenuActive', 'show'],
+  props: ['detect', 'isMenuActive'],
   data: () => ({
     index: 0,
     inited: false,
-    slider: null,
-    title: ''
+    slider: null
   }),
   computed: {
     num() {
@@ -61,13 +54,12 @@ export default {
       const container = document.querySelector(selector)
 
       this.slider = new Slider({
-        initialSlug: this.$route.params.id,
-        selector,
+        container,
         images,
-        three
+        initialSlug: this.$route.params.id
       })
 
-      window.slider = this.slider
+      window.slider = this
 
       this.initEvents(container)
     },
@@ -104,15 +96,17 @@ export default {
           translateY: ['100%', '0%'],
           complete: () => {
             setTimeout(() => {
-              this.slider.pause()
-            }, 400)
+              document.body.classList.add('scrollable')
+              // this.slider.pause()
+            }, 200)
           }
         })
       })
 
       // Case leave
       container.addEventListener('out:begin', () => {
-        this.slider.start()
+        document.body.classList.remove('scrollable')
+        if (!this.slider.RAF) this.slider.play()
 
         anime({
           targets: '.case__container',
@@ -127,39 +121,6 @@ export default {
           translateY: ['0%', '-100%']
         })
       })
-
-      // Menu
-      container.addEventListener('showmenu:begin', () => {
-        this.$emit('toggle-menu', true)
-      })
-
-      container.addEventListener('hidemenu:complete', () => {
-        this.$emit('toggle-menu', false)
-      })
-    }
-  },
-  watch: {
-    'scroll.counter'() {
-      if (!this.inited) return false
-
-      let dir = 'next'
-
-      if (this.detect.isSafari || this.detect.isMobileDevice) {
-        dir = this.scroll.direction === 1 ? 'next' : 'back'
-      } else {
-        dir = this.scroll.deltaY < 0 ? 'next' : 'back'
-      }
-
-      this.slider.indexControl(dir)
-    },
-    show(show) {
-      if (!this.inited) return false
-
-      this.slider.pause()
-      if (show) {
-        if (loop.stopped) loop.start()
-        this.slider.start()
-      }
     }
   }
 }
@@ -199,6 +160,7 @@ export default {
   line-height: 1
   font-size: 11px
   letter-spacing: 0.01em
+  color: #fff
 
   span:nth-child(2)
     background: #fff
