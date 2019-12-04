@@ -4,6 +4,8 @@ const { THREE, TweenMax, Power2 } = window
 
 export default class Slider {
   constructor({ container, images, initialSlug }) {
+    window.slider = this
+
     this.container = container
     this.images = images
     this.initialSlug = initialSlug
@@ -546,6 +548,9 @@ export default class Slider {
         event.preventDefault()
         event.stopPropagation()
         this.initialPoint = event.changedTouches[0]
+
+        this.mouse.x = (event.touches[0].pageX / window.innerWidth) * 2 - 1
+        this.mouse.y = -(event.touches[0].pageY / window.innerHeight) * 2 + 1
       },
       false
     )
@@ -610,8 +615,6 @@ export default class Slider {
   showMenu() {
     new Promise(resolve => {
       this.moving = true
-
-      console.log(this)
 
       let newPos
       if (!this.insideSphere.visible) {
