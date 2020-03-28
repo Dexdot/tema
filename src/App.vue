@@ -55,7 +55,12 @@ export default {
   methods: {
     onSceneInit() {
       this.sceneInited = true
-      if (this.$route.name === 'case') this.$refs.scene.slider.enter(true)
+
+      if (this.$route.name === 'case') {
+        this.$refs.scene.slider.enter(true)
+      } else {
+        this.$refs.scene.slider.firstAnim()
+      }
     },
     showMenu() {
       new Promise(async resolve => {
