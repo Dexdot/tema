@@ -2,7 +2,7 @@
   <div class="preloader">
     <div class="preloader-cover" ref="cover"></div>
     <div class="preloader-logo u-center">
-      <svg
+      <!-- <svg
         class="preloader-logo-icon"
         ref="logo"
         width="17"
@@ -22,6 +22,28 @@
           stroke-width="1"
           stroke-dasharray="0 100"
         />
+      </svg> -->
+
+      <svg
+        class="preloader-logo-icon"
+        ref="logo"
+        width="136"
+        height="115"
+        viewBox="0 0 136 115"
+        fill="none"
+      >
+        <path
+          d="M4 112L68.2747 8L132.326 112"
+          stroke="black"
+          stroke-width="8"
+          stroke-dasharray="0 245"
+        />
+        <path
+          d="M4 112L68.2747 8L132.326 112"
+          stroke="white"
+          stroke-width="8"
+          stroke-dasharray="0 245"
+        />
       </svg>
     </div>
   </div>
@@ -34,18 +56,28 @@ export default {
   name: 'Preloader',
   methods: {
     animate() {
-      const first = this.$refs.logo.querySelector('path:nth-child(1)')
-      const second = this.$refs.logo.querySelector('path:nth-child(2)')
+      const { logo } = this.$refs
+      const black = logo.querySelector('path:nth-child(1)')
+      const white = logo.querySelector('path:nth-child(2)')
 
       anime({
-        targets: second,
+        targets: [black, white],
         strokeDashoffset: [anime.setDashoffset, 0],
         easing: 'easeInOutCubic',
-        duration: 1000,
-        complete: () => {
-          anime.set(first, { opacity: 1 })
+        duration: 800
+      })
 
-          setTimeout(() => {
+      setTimeout(() => {
+        anime.set(logo, { scale: '-1, 1' })
+
+        this.$emit('complete')
+
+        anime({
+          targets: white,
+          strokeDashoffset: anime.setDashoffset,
+          easing: 'easeInOutCubic',
+          duration: 600,
+          complete: () => {
             anime({
               targets: '.preloader-logo',
               easing: 'easeInOutCubic',
@@ -60,11 +92,9 @@ export default {
               rotate: -20,
               scale: 1.5
             })
-          }, 200)
-
-          this.$emit('complete')
-        }
-      })
+          }
+        })
+      }, 800)
     }
   }
 }
