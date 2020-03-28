@@ -133,16 +133,10 @@ export default {
       if (!this.slider.RAF) this.slider.play()
 
       anime({
-        targets: '.case__container',
+        targets: '.case__title, .case__container, .next',
         duration: 600,
         easing: 'easeInCubic',
         opacity: [1, 0]
-      })
-      anime({
-        targets: '.case__title',
-        duration: 600,
-        easing: 'easeInCubic',
-        opacity: 0
       })
     }
   }

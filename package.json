@@ -14,7 +14,6 @@
     "charming": "^3.0.2",
     "contentful": "^7.5.0",
     "core-js": "^2.6.5",
-    "gsap": "^2.1.3",
     "raf-engine": "^0.3.0",
     "three": "^0.109.0",
     "virtual-scroll": "^1.4.0",
