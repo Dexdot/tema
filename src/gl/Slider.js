@@ -831,7 +831,10 @@ export default class Slider {
       transparent: true
     })
 
-    const fontJson = require('@/assets/Wooland.json')
+    const spectralFontJson = require('@/assets/Spectral.json')
+    const spectralFont = new THREE.Font(spectralFontJson)
+
+    const fontJson = require('@/assets/Woodland.json')
     const font = new THREE.Font(fontJson)
     this.font = font
 
@@ -882,7 +885,7 @@ just drop me a message.`
     let geometry = new THREE.TextBufferGeometry(
       isMobWidth ? mobileText : desktopText,
       {
-        font: font,
+        font: spectralFont,
         size: isMobWidth ? 28 : 40,
         height: 1,
         curveSegments: 12,
@@ -894,7 +897,7 @@ just drop me a message.`
       }
     )
     let geometry1 = new THREE.TextBufferGeometry(`Feel free to mail me`, {
-      font: font,
+      font: spectralFont,
       size: isMobWidth ? 28 : 40,
       height: 1,
       curveSegments: 12,
