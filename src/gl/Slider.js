@@ -86,12 +86,12 @@ export default class Slider {
           cubeMap: this.images['legenda']
         }
       },
-      // TWP
+      // Manu
       3: {
-        slug: 'twp',
-        name: 'TWP',
+        slug: 'manu',
+        name: 'Manu',
         uniformsOut: {
-          cubeMap: this.images['twp']
+          cubeMap: this.images['manu']
         }
       },
       // ENERGOTEK
@@ -845,10 +845,11 @@ export default class Slider {
     })
 
     let geometry = new THREE.TextBufferGeometry(
+      // eslint-disable-next-line
       `Hello! I'm Artem, a digital 
-      designer. I create digital 
-      experients (Web Design / 
-      UI/UX Design / App Design)`,
+ designer. I create digital 
+ expeients (Web Design / 
+ UI/UX Design / App Design)`,
       {
         font: font,
         size: 80,

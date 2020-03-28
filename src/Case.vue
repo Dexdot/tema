@@ -6,7 +6,10 @@
       </h1>
     </div>
 
-    <div class="case__container">
+    <div
+      class="case__container"
+      :style="{ 'background-color': content.background || '#ffffff' }"
+    >
       <div class="case__content">
         <div class="case__caption">
           <h2>About {{ content.title }}</h2>
