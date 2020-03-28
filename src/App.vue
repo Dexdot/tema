@@ -147,9 +147,12 @@ body:not(.scrollable)
 
 <style lang="sass" scoped>
 .wrapper
-  transition: opacity 0.25s ease
+  transition: opacity 0.3s ease 1s
+
   &.hidden
     opacity: 0
     pointer-events: none
     user-select: none
+
+    transition: opacity 0.25s ease
 </style>
