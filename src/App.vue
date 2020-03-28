@@ -59,7 +59,11 @@ export default {
   methods: {
     onSceneInit() {
       this.sceneInited = true
-      this.$refs.preloader.animate()
+      this.$nextTick(() => {
+        setTimeout(() => {
+          this.$refs.preloader.animate()
+        }, 50)
+      })
     },
     onPreloaderComplete() {
       if (this.$route.name === 'case') {

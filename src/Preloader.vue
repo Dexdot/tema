@@ -42,7 +42,6 @@ export default {
         strokeDashoffset: [anime.setDashoffset, 0],
         easing: 'easeInOutCubic',
         duration: 1000,
-        delay: 200,
         complete: () => {
           anime.set(first, { opacity: 1 })
 
@@ -63,9 +62,7 @@ export default {
             })
           }, 200)
 
-          setTimeout(() => {
-            this.$emit('complete')
-          }, 300)
+          this.$emit('complete')
         }
       })
     }
