@@ -466,7 +466,7 @@ export default class Slider {
     this.camera.lookAt(this.scene.position)
     this.TGroup.add(this.about)
     this.about.position.x = -1200
-    this.about.position.y = 150
+    this.about.position.y = 420
     // this.TGroup.add(this.works)
     // this.works.position.x = -1200
     // this.works.position.y = -100
@@ -778,10 +778,11 @@ export default class Slider {
       this.adaptMode = true
       // this.about.p.position.x = 0
       // this.works.p.position.x = 0
-      this.contact.p.position.x = 0
-      this.about.position.x = -350
       // this.works.position.x = -370;
+      this.contact.p.position.x = 0
+      this.about.position.x = -380
       this.contact.position.x = -380
+
       if (!this.inMenu || !this.insideSphere) {
         for (let i = 0; i < this.arrB.length; i++) {
           if (i != this.index) {
@@ -793,10 +794,11 @@ export default class Slider {
       this.adaptMode = false
       // this.about.p.position.x = -870
       // this.works.p.position.x = -800
+      // this.works.position.x = -1200
       this.contact.p.position.x = -800
       this.about.position.x = -1200
-      // this.works.position.x = -1200
       this.contact.position.x = -1200
+
       if (!this.inMenu || !this.insideSphere) {
         for (let i = 0; i < this.arrB.length; i++) {
           this.arrB[i].visible = true
@@ -844,15 +846,43 @@ export default class Slider {
       bevelSegments: 5
     })
 
-    let geometry = new THREE.TextBufferGeometry(
+    const desktopText =
       // eslint-disable-next-line
-      `Hello! I'm Artem, a digital 
- designer. I create digital 
- expeients (Web Design / 
- UI/UX Design / App Design)`,
+      `Hi, I'm Artem Sokolov, a Russian
+digital designer and art director based
+in Saint Petersburg. I’ve been working
+in the digital area for more than 4 years.
+My work has been varied – from branding,
+apps, UX/UI, websites and digital tools –
+but always with a human-centered approach
+and a keen eye for detail. My work has been
+recognized on Awwwards, CSSDA and many
+more. Let's get in touch, for any project
+inquires or just drop me a message.`
+
+    const mobileText =
+      // eslint-disable-next-line
+      `Hi, I'm Artem Sokolov, a Russian
+digital designer and art director
+based in Saint Petersburg. I’ve been
+working in the digital area for more
+than 4 years. My work has been varied –
+from branding, apps, UX/UI, websites
+and digital tools – but always with
+a human-centered approach and a keen
+eye for detail. My work has been
+recognized on Awwwards, CSSDA and
+many more. Let's get in touch, for
+any project inquires or
+just drop me a message.`
+
+    const isMobWidth = window.innerWidth <= 1024
+
+    let geometry = new THREE.TextBufferGeometry(
+      isMobWidth ? mobileText : desktopText,
       {
         font: font,
-        size: 80,
+        size: isMobWidth ? 28 : 40,
         height: 1,
         curveSegments: 12,
         bevelEnabled: false,
@@ -862,9 +892,9 @@ export default class Slider {
         bevelSegments: 5
       }
     )
-    let geometry1 = new THREE.TextBufferGeometry(`Email me`, {
+    let geometry1 = new THREE.TextBufferGeometry(`Feel free to mail me`, {
       font: font,
-      size: 80,
+      size: isMobWidth ? 28 : 40,
       height: 1,
       curveSegments: 12,
       bevelEnabled: false,
