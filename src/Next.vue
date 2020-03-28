@@ -1,5 +1,26 @@
 <template>
   <section class="next">
+    <div class="next-circle">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
+        <circle
+          cx="36"
+          cy="36"
+          r="35"
+          fill="none"
+          stroke-miterlimit="10"
+          stroke-width="2"
+        ></circle>
+        <circle
+          cx="36"
+          cy="36"
+          r="35"
+          fill="none"
+          stroke-miterlimit="10"
+          stroke-width="2"
+          class="next-circle-stroke"
+        ></circle>
+      </svg>
+    </div>
     <span class="next-counter" ref="counter">{{ counter }}</span>
   </section>
 </template>
@@ -27,7 +48,7 @@ export default {
         complete: () => {
           if (this.counter <= 1) {
             this.isAnimating = false
-            this.$emit('complete')
+            // this.$emit('complete')
           } else {
             this.counter--
             this.startCount()
@@ -85,7 +106,6 @@ export default {
 
 <style lang="sass" scoped>
 .next
-  opacity: 0
   pointer-events: none
 
   position: relative
@@ -101,4 +121,23 @@ export default {
 
   opacity: 0
   pointer-events: none
+
+.next-circle,
+.next-circle svg
+  width: 72px
+  height: 72px
+
+.next-circle
+  position: absolute
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
+
+  circle
+    stroke-dasharray: 219.556
+    stroke-dashoffset: 439.112
+    stroke: #fff
+
+    &:not(.next-circle-stroke)
+      opacity: 0.3
 </style>
