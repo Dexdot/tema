@@ -1,7 +1,7 @@
 <template>
   <section class="next">
-    <div class="next-circle">
-      <span class="next-circle-text">Back</span>
+    <div class="next-circle" v-show="showCircle">
+      <!-- <span class="next-circle-text">Back</span> -->
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
         <circle
           cx="36"
@@ -34,7 +34,8 @@ export default {
   data: () => ({
     isAnimating: false,
     timers: [],
-    killCounter: null
+    killCounter: null,
+    showCircle: false
   }),
   mounted() {
     this.observe()
@@ -72,6 +73,8 @@ export default {
       const observer = new IntersectionObserver(
         entries => {
           entries.forEach(entry => {
+            this.showCircle = entry.isIntersecting
+
             if (entry.intersectionRatio >= 0.4) {
               if (!this.isAnimating) {
                 this.startCount()
@@ -108,14 +111,14 @@ export default {
 
 .next-circle,
 .next-circle svg
-  width: 88px
-  height: 88px
+  width: 72px
+  height: 72px
 
 .next-circle
-  position: absolute
-  transform: translate(-50%, 0)
+  position: fixed
+  top: 50%
   left: 50%
-  bottom: 24vh
+  transform: translate(-50%, -50%)
 
   text-align: center
 
