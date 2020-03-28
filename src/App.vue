@@ -1,6 +1,10 @@
 <template>
   <div id="app">
-    <Main :isMenuActive="isMenuActive" @btn-click="onMenuButtonClick" />
+    <Main
+      :isMenuActive="isMenuActive"
+      @btn-click="onMenuButtonClick"
+      @showreel-click="onShowreelBtnClick"
+    />
     <Slider ref="scene" :detect="detect" @init="onSceneInit" />
 
     <div :class="['wrapper', { hidden: hideContent }]">
@@ -20,12 +24,17 @@
       </transition>
     </div>
 
+    <Showreel
+      :active="isShowreelActive"
+      @showreel-close="isShowreelActive = false"
+    />
     <Preloader ref="preloader" @complete="onPreloaderComplete" />
   </div>
 </template>
 
 <script>
 import Preloader from '@/Preloader'
+import Showreel from '@/Showreel'
 import Slider from '@/Slider'
 import Main from '@/Main.vue'
 import { detectDevices } from '@/scripts/detect'
@@ -34,12 +43,14 @@ export default {
   name: 'App',
   components: {
     Preloader,
+    Showreel,
     Slider,
     Main
   },
   data: () => ({
     sceneInited: false,
     mounted: false,
+    isShowreelActive: false,
     isMenuActive: false,
     dir: {},
     detect: {}
@@ -98,6 +109,11 @@ export default {
       } else {
         this.hideMenu()
       }
+    },
+    onShowreelBtnClick() {
+      if (this.isMenuActive) return false
+
+      this.isShowreelActive = true
     },
     async enter(el, done) {
       const { name } = this.dir.to
