@@ -19,10 +19,11 @@
       </svg>
     </router-link>
 
-    <router-link
+    <a
       class="play ui-btn"
-      to="/"
-      @mouseenter.native="hover($refs.play)"
+      href="https://vimeo.com/401593355"
+      target="_blank"
+      @mouseenter="hover($refs.play)"
     >
       <svg width="14" height="17" viewBox="0 0 14 17" fill="none" ref="play">
         <path
@@ -36,7 +37,7 @@
           stroke-width="1.4"
         />
       </svg>
-    </router-link>
+    </a>
 
     <div class="sound ui-btn">
       <SoundBar />
