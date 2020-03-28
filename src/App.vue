@@ -19,10 +19,13 @@
         />
       </transition>
     </div>
+
+    <Preloader ref="preloader" @complete="onPreloaderComplete" />
   </div>
 </template>
 
 <script>
+import Preloader from '@/Preloader'
 import Slider from '@/Slider'
 import Main from '@/Main.vue'
 import { detectDevices } from '@/scripts/detect'
@@ -30,6 +33,7 @@ import { detectDevices } from '@/scripts/detect'
 export default {
   name: 'App',
   components: {
+    Preloader,
     Slider,
     Main
   },
@@ -55,7 +59,9 @@ export default {
   methods: {
     onSceneInit() {
       this.sceneInited = true
-
+      this.$refs.preloader.animate()
+    },
+    onPreloaderComplete() {
       if (this.$route.name === 'case') {
         this.$refs.scene.slider.enter(true)
       } else {
