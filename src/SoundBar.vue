@@ -7,7 +7,7 @@
     <div class="sound-bar__line"></div>
     <audio
       ref="audio"
-      :src="require('./assets/audio/ambient.mp3')"
+      src="/audio/ambient.mp3"
       loop
       autoplay
       playsinline
