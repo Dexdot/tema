@@ -83,6 +83,11 @@ export default {
         this.$router.push(`/case/${this.slider.sceneParams[this.index].slug}`)
       })
 
+      // Click on contact link (mail)
+      container.addEventListener('click:contact', () => {
+        window.location.href = 'mailto:artemartsokolov@gmail.com'
+      })
+
       // Case enter
       container.addEventListener('enter:complete', () => {
         this.caseEnter()
