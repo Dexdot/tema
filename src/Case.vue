@@ -53,6 +53,8 @@
 </template>
 
 <script>
+import anime from 'animejs'
+
 import Next from '@/Next'
 import BaseImage from '@/BaseImage'
 import { getCase } from '@/scripts/api'
@@ -66,19 +68,70 @@ export default {
   },
   data: () => ({
     content: {},
-    observer: {}
+    observer: {},
+    scrollY: 0,
+    scrollDir: '',
+    isTitleAnimating: false,
+    isTitleVisible: true
   }),
   async created() {
     this.content = await getCase(this, this.$route.params.id)
     this.createObserver()
     this.$nextTick(() => {
+      this.handleScroll()
+
       if (this.$refs.videos && this.$refs.videos.length > 0)
         this.$refs.videos.forEach(v => {
           this.observer.observe(v.parentElement)
         })
     })
   },
+  beforeDestroy() {
+    window.removeEventListener('scroll', this.onScroll)
+  },
   methods: {
+    handleScroll() {
+      window.addEventListener('scroll', this.onScroll.bind(this))
+    },
+    onScroll() {
+      const { pageYOffset, innerHeight } = window
+      this.scrollDir = pageYOffset > this.scrollY ? 'down' : 'up'
+      this.scrollY = pageYOffset
+
+      if (
+        this.scrollDir === 'down' &&
+        this.isTitleVisible &&
+        pageYOffset > innerHeight * 0.1
+      ) {
+        this.toggleTitle(true)
+      }
+
+      if (
+        this.scrollDir === 'up' &&
+        !this.isTitleVisible &&
+        pageYOffset <= innerHeight * 0.3
+      ) {
+        this.toggleTitle(false)
+      }
+    },
+    toggleTitle(hide = true) {
+      if (this.isTitleAnimating) return false
+      this.isTitleAnimating = true
+
+      const chars = this.$el.querySelectorAll('.case-title-char')
+
+      anime({
+        targets: chars,
+        translateY: hide ? ['0%', '-110%'] : ['110%', '0%'],
+        easing: hide ? 'easeInCubic' : 'easeOutCubic',
+        duration: 400,
+        delay: anime.stagger(20),
+        complete: () => {
+          this.isTitleAnimating = false
+          this.isTitleVisible = !hide
+        }
+      })
+    },
     createObserver() {
       this.observer = new IntersectionObserver(
         entries => {
@@ -110,7 +163,7 @@ export default {
   padding-top: 101vh
 
 .case__fixed
-  position: absolute
+  position: fixed
   top: 50vh
   left: 50%
 
@@ -137,13 +190,18 @@ body.is-mob .case__fixed
   +yo('font-size', (320px: 28px, 375px: 34px, 768px: 48px, 1440px: 72px, 1920px: 96px))
   text-align: center
   letter-spacing: 0.02em
+  line-height: 1
   color: #fff
+  white-space: nowrap
 
   overflow: hidden
   transform: translate(-50%, -50%)
 
-  span
-    display: block
+  /deep/ span
+    display: inline-block
+    will-change: transform
+    &.is-space
+      min-width: 0.3em
 
 .case__caption
   position: relative
@@ -250,10 +308,9 @@ body.is-mob .case__fixed
 
 
 // Case I/O animations
-.case__container
+.case__container,
+.case__title
   opacity: 0
-.case__title span
-  transform: translateY(110%)
 
 // Image animations
 .case__img:not(.case__img--full)

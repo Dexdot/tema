@@ -1,17 +1,12 @@
-import anime from 'animejs'
+import anime from 'animejs';
 
 const enter = (ctx, cb) =>
   new Promise(async resolve => {
-    console.log('case enter start')
-
     // Show canvas
-    ctx.$el.querySelector('#inside').classList.add('visible')
+    ctx.$el.querySelector('#inside').classList.add('visible');
 
     // Animate enter scene
-    await ctx.scene.enter()
-
-    // Show title
-    anime.set('.case__title span', { translateY: '0%' })
+    await ctx.scene.enter();
 
     // Show content
     anime({
@@ -20,18 +15,15 @@ const enter = (ctx, cb) =>
       duration: 300,
       easing: 'easeOutCubic',
       complete: () => {
-        console.log('case enter end')
-        if (cb) cb()
-        resolve()
+        if (cb) cb();
+        resolve();
       }
-    })
-  })
+    });
+  });
 
 const leave = (ctx, cb) =>
   new Promise(resolve => {
-    console.log('case leave start')
-
-    anime.set('#slider', { transition: 'unset' })
+    anime.set('#slider', { transition: 'unset' });
 
     // Hide content
     anime({
@@ -41,7 +33,7 @@ const leave = (ctx, cb) =>
       easing: 'easeInCubic',
       complete: async () => {
         // Animate back scene
-        await ctx.scene.back()
+        await ctx.scene.back();
 
         // Hide & destroy
         anime({
@@ -50,15 +42,14 @@ const leave = (ctx, cb) =>
           duration: 600,
           easing: 'easeInCubic',
           complete: () => {
-            ctx.scene.destroy()
+            ctx.scene.destroy();
 
-            console.log('case leave end')
-            if (cb) cb()
-            resolve()
+            if (cb) cb();
+            resolve();
           }
-        })
+        });
       }
-    })
-  })
+    });
+  });
 
-export default { enter, leave }
+export default { enter, leave };

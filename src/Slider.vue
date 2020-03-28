@@ -12,6 +12,8 @@
 
 <script>
 import anime from 'animejs'
+import charming from 'charming'
+
 import Slider from '@/gl/Slider'
 import { getCases } from '@/scripts/api'
 
@@ -83,43 +85,64 @@ export default {
 
       // Case enter
       container.addEventListener('enter:complete', () => {
-        anime({
-          targets: '.case__container',
-          duration: 800,
-          easing: 'easeOutCubic',
-          opacity: [0, 1]
-        })
-        anime({
-          targets: '.case__title span',
-          duration: 800,
-          easing: 'easeOutCubic',
-          translateY: ['100%', '0%'],
-          complete: () => {
-            setTimeout(() => {
-              document.body.classList.add('scrollable')
-              // this.slider.pause()
-            }, 200)
-          }
-        })
+        this.caseEnter()
       })
 
       // Case leave
       container.addEventListener('out:begin', () => {
-        document.body.classList.remove('scrollable')
-        if (!this.slider.RAF) this.slider.play()
+        this.caseLeave()
+      })
+    },
+    caseEnter() {
+      // Container
+      anime({
+        targets: '.case__container',
+        duration: 800,
+        easing: 'easeOutCubic',
+        opacity: [0, 1]
+      })
 
-        anime({
-          targets: '.case__container',
-          duration: 600,
-          easing: 'easeInCubic',
-          opacity: [1, 0]
-        })
-        anime({
-          targets: '.case__title span',
-          duration: 600,
-          easing: 'easeInCubic',
-          translateY: ['0%', '-100%']
-        })
+      // Show title
+      const title = document.querySelector('.case__title span')
+      charming(title)
+      const chars = title.querySelectorAll('span')
+      chars.forEach(char => {
+        char.classList.add('case-title-char')
+        if (char.textContent === ' ') char.classList.add('is-space')
+      })
+
+      anime.set(chars, { translateY: '100%' })
+      anime.set('.case__title', { opacity: 1 })
+
+      anime({
+        targets: chars,
+        translateY: '0%',
+        easing: 'easeOutQuart',
+        duration: 800,
+        delay: anime.stagger(30),
+        complete: () => {
+          setTimeout(() => {
+            document.body.classList.add('scrollable')
+            // this.slider.pause()
+          }, 200)
+        }
+      })
+    },
+    caseLeave() {
+      document.body.classList.remove('scrollable')
+      if (!this.slider.RAF) this.slider.play()
+
+      anime({
+        targets: '.case__container',
+        duration: 600,
+        easing: 'easeInCubic',
+        opacity: [1, 0]
+      })
+      anime({
+        targets: '.case__title',
+        duration: 600,
+        easing: 'easeInCubic',
+        opacity: 0
       })
     }
   }
