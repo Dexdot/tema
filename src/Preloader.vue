@@ -88,6 +88,7 @@ export default {
               targets: this.$refs.cover,
               easing: 'easeInOutSine',
               duration: 800,
+              translateX: window.innerWidth <= 500 ? '-25%' : '0%',
               translateY: '-180%',
               rotate: -20,
               scale: 1.5
