@@ -1,5 +1,18 @@
 <template>
   <div id="app">
+    <ul :class="['social', { 'social--visible': isMenuActive }]">
+      <li>
+        <a href="https://www.behance.net/artartem" class="u-center">
+          <img src="@/assets/be.svg" alt="Behance" />
+        </a>
+      </li>
+      <li>
+        <a href="https://www.instagram.com/artemartsokolov/" class="u-center">
+          <img src="@/assets/insta.svg" alt="Instagram" />
+        </a>
+      </li>
+    </ul>
+
     <Main
       :isMenuActive="isMenuActive"
       @btn-click="onMenuButtonClick"
@@ -171,4 +184,30 @@ body:not(.scrollable)
     user-select: none
 
     transition: opacity 0.25s ease
+
+.social
+  z-index: 1
+  position: fixed
+  top: 50%
+  right: var(--unit-h)
+  transform: translateY(-50%)
+
+  opacity: 0
+  pointer-events: none
+  user-select: none
+
+  transition: opacity 0.25s ease
+
+.social--visible
+  opacity: 1
+  pointer-events: auto
+  user-select: auto
+
+  transition: opacity 0.25s ease 1s
+
+.social li:not(:last-child)
+  margin-bottom: 16px
+
+.social a
+  width: 16px
 </style>
