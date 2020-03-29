@@ -8,7 +8,7 @@
 
     <div
       class="case__container"
-      :style="{ 'background-color': content.background || '#ffffff' }"
+      :style="{ 'background-color': content.background || '#FBFBFB' }"
     >
       <div class="case__content">
         <div class="case__caption">
@@ -191,7 +191,7 @@ body.is-mob .case__fixed
   text-align: center
   letter-spacing: 0.02em
   line-height: 1
-  color: #fff
+  color: #F4F4F4
   white-space: nowrap
 
   overflow: hidden
@@ -215,7 +215,7 @@ body.is-mob .case__fixed
 
   &,
   & a
-    color: $black
+    color: #A2A2A4
 
 .case__url
   font-size: 14px

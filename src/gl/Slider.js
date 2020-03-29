@@ -63,7 +63,7 @@ export default class Slider {
     this.tCubes = []
 
     this.sceneParams = {
-      // VK
+      // Dubrava
       0: {
         slug: 'dubrava',
         name: 'Dubrava',
@@ -79,20 +79,20 @@ export default class Slider {
           cubeMap: this.images['air-energy']
         }
       },
-      // LEGENDA
-      2: {
-        slug: 'legenda',
-        name: 'Legenda',
-        uniformsOut: {
-          cubeMap: this.images['legenda']
-        }
-      },
       // Manu
-      3: {
+      2: {
         slug: 'manu',
         name: 'Manu',
         uniformsOut: {
           cubeMap: this.images['manu']
+        }
+      },
+      // LEGENDA
+      3: {
+        slug: 'legenda',
+        name: 'Legenda',
+        uniformsOut: {
+          cubeMap: this.images['legenda']
         }
       },
       // ENERGOTEK
