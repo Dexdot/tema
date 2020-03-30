@@ -249,7 +249,7 @@ body.is-mob .case__fixed
   z-index: 1
 
   @media (max-width: 800px)
-    width: 80vw
+    width: 100vw
 
 .case__content
   margin-left: auto

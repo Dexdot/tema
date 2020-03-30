@@ -1177,6 +1177,7 @@ just drop me a message.`
         this.last = null
       }
     }
+
     if (intersects.length > 0) {
       if (
         this.last != null &&
@@ -1202,6 +1203,7 @@ just drop me a message.`
           ease: Power2.easeOut
         })
       }
+
       if (this.last == null && intersects[0].object.name != 'inside') {
         this.last = intersects[0].object
 
@@ -1231,17 +1233,8 @@ just drop me a message.`
     }
 
     intersects = this.raycaster.intersectObjects(this.TGroup.children)
-
-    // ['about', 'works', 'contact'].forEach(key => {
-    // ;['about', 'contact'].forEach(key => {
     ;['contact'].forEach(key => {
       if (intersects.length > 0 && intersects[0].object.name == key) {
-        // const isContact = key === 'contact'
-        // const color = isContact ? 0xcbcbcb : 0xffffff
-
-        // this.fill(new THREE.Color(color), 1, this[key])
-        // if (!isContact)
-        //   this[key].material.uniforms.color.value = new THREE.Color(color)
         this.menuTime[key] = 1
 
         TweenMax.to(this[key].material.uniforms.time, 1, {
