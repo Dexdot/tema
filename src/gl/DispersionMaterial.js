@@ -15,7 +15,7 @@ export default THREE => {
       end: { value: 1.0 },
       opacity: { value: 1.0 }
     },
-    defines: { DISPERSION_SAMPLES: 50 },
+    defines: { DISPERSION_SAMPLES: 30 },
 
     fragmentShader: `
     uniform float dispersion;
