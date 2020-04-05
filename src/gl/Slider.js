@@ -734,6 +734,34 @@ export default class Slider {
           value: !this.inMenu ? 0.2 : 1,
           ease: Power2.easeInOut
         })
+      } else {
+        this.lockControls.unlock()
+        this.moving = true
+
+        this.raycaster.setFromCamera(new THREE.Vector2(), this.insideCamera)
+        var intersect = this.raycaster.intersectObjects(this.scene.children)
+        let tempTarget = new THREE.Vector3(
+          intersect[0].point.x,
+          intersect[0].point.y,
+          intersect[0].point.z
+        )
+        TweenMax.to(tempTarget, 3, {
+          x: this.target.x,
+          y: this.target.y,
+          z: this.target.z,
+          ease: Power2.easeInOut,
+          onComplete: () => {
+            this.moving = false
+            this.lockControls.unlock()
+          },
+          onUpdate: () => {
+            this.insideCamera.lookAt(tempTarget)
+          }
+        })
+        // if (this.lockControls.isLocked) {
+        // } else {
+        //   this.lockControls.lock()
+        // }
       }
     })
   }
@@ -791,7 +819,7 @@ export default class Slider {
       transparent: true
     })
 
-    const fontJson = require('@/assets/Woodland-Regular.json')
+    const fontJson = require('@/assets/fonts/Woodland.json')
     const font = new THREE.Font(fontJson)
     this.font = font
 
@@ -834,19 +862,19 @@ export default class Slider {
       bevelSegments: 5
     })
 
-    // const text2 =
-    //   // prettier-ignore
-    //   `Interactive
-    //   designer
-    //   & Creative
-    //   director`
-
     const text2 =
       // prettier-ignore
       `Interactive
-            designer
-        & Creative
-            director`
+      designer
+  & Creative
+       director`
+
+    // const text2 =
+    //   // prettier-ignore
+    //   `Interactive
+    //         designer
+    //     & Creative
+    //         director`
 
     let geometry2 = new THREE.TextBufferGeometry(text2, {
       font: font,
@@ -881,21 +909,21 @@ export default class Slider {
 
     resCounter++
 
-    const lightFontJson = require('@/assets/Woodland-Light.json')
+    const lightFontJson = require('@/assets/fonts/Woodland-Light.json')
     const lightFont = new THREE.Font(lightFontJson)
 
     let geometry = new THREE.TextBufferGeometry(
       `Hi, I'm Artem Sokolov, a Russian
-      digital designer and art director based
-      in Saint Petersburg. I’ve been working
-      in the digital area for more than 4 years.
-      My work has been varied – from branding,
-      apps, UX/UI, websites and digital tools –
-      but always with a human-centered approach
-      and a keen eye for detail. My work has been
-      recognized on Awwwards, CSSDA and many
-      more. Let's get in touch, for any project
-      inquires or just drop me a message.`,
+digital designer and art director based
+in Saint Petersburg. I’ve been working
+in the digital area for more than 4 years.
+My work has been varied – from branding,
+apps, UX/UI, websites and digital tools –
+but always with a human-centered approach
+and a keen eye for detail. My work has been
+recognized on Awwwards, CSSDA and many
+more. Let's get in touch, for any project
+inquires or just drop me a message.`,
       {
         font: lightFont,
         size: 40,

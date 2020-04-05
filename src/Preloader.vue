@@ -2,28 +2,6 @@
   <div class="preloader">
     <div class="preloader-cover" ref="cover"></div>
     <div class="preloader-logo u-center">
-      <!-- <svg
-        class="preloader-logo-icon"
-        ref="logo"
-        width="17"
-        height="15"
-        viewBox="0 0 17 15"
-        fill="none"
-      >
-        <path
-          d="M8.54923 2.78119L14.7613 13.793H14.7791L7.88757 1.55152L1.25903 13.793H1.35169L7.23469 2.79592L7.87856 1.59234L8.54923 2.78119Z"
-          stroke="black"
-          stroke-width="1"
-          style="opacity: 0"
-        />
-        <path
-          d="M8.54923 2.78119L14.7613 13.793H14.7791L7.88757 1.55152L1.25903 13.793H1.35169L7.23469 2.79592L7.87856 1.59234L8.54923 2.78119Z"
-          stroke="white"
-          stroke-width="1"
-          stroke-dasharray="0 100"
-        />
-      </svg> -->
-
       <svg
         class="preloader-logo-icon"
         ref="logo"
@@ -133,6 +111,6 @@ export default {
   transform: translate(-50%, -50%)
 
 .preloader-logo-icon
-  width: 80px
-  height: 80px
+  width: 40px
+  height: 40px
 </style>
