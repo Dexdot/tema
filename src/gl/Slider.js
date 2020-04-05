@@ -46,6 +46,8 @@ export default class Slider {
       ) //75
     }
 
+    this.insideCamera.add(new THREE.Group())
+    this.insideCamera.children[0].position.x = 10
     this.scene.background = new THREE.Color(0x020202)
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -165,9 +167,6 @@ export default class Slider {
       this.renderer.render(this.scene, this.camera)
       this.TGroup.lookAt(this.camera.position)
     } else {
-      if (!this.lockControls.isLocked) {
-        this.insideCamera.lookAt(this.target)
-      }
       this.TGroup.lookAt(this.insideCamera.position)
       this.insideSphere.material.uniforms.time.value = this.time
       this.renderer.render(this.scene, this.insideCamera)
@@ -596,15 +595,32 @@ export default class Slider {
         newPos.z *= 1.1
         this.TGroup.scale.set(1, 1, 1)
       } else {
-        // newPos = new THREE.Vector3(
-        //   this.insideCamera.position.x,
-        //   100,
-        //   this.insideCamera.position.z
-        // )
-        // newPos.x *= -60.1
-        // this.TGroup.scale.set(0.3, 0.3, 0.3)
-        // this.TGroup.visible = true
-        this.lockControls.lock()
+        if (this.lockControls.isLocked) {
+          this.lockControls.unlock()
+          this.moving = true
+
+          this.raycaster.setFromCamera(new THREE.Vector2(), this.insideCamera)
+          var intersect = this.raycaster.intersectObjects(this.scene.children)
+          let tempTarget = new THREE.Vector3(
+            intersect[0].point.x,
+            intersect[0].point.y,
+            intersect[0].point.z
+          )
+          TweenMax.to(tempTarget, 3, {
+            x: this.target.x,
+            y: this.target.y,
+            z: this.target.z,
+            ease: Power2.easeInOut,
+            onComplete: () => {
+              this.moving = false
+            },
+            onUpdate: () => {
+              this.insideCamera.lookAt(tempTarget)
+            }
+          })
+        } else {
+          this.lockControls.lock()
+        }
       }
 
       let tmpControlBezier
