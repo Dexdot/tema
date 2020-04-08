@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" @keydown="onKeydown">
     <ul :class="['social', { 'social--visible': isMenuActive }]">
       <li>
         <a href="https://www.behance.net/artartem" class="u-center">
@@ -63,6 +63,7 @@ export default {
   data: () => ({
     sceneInited: false,
     mounted: false,
+    isPointersLockActive: false,
     isShowreelActive: false,
     isMenuActive: false,
     dir: {},
@@ -81,8 +82,19 @@ export default {
     })
   },
   methods: {
+    onKeydown({ keyCode }) {
+      if (keyCode !== 32 || this.isMenuActive || this.$route.name !== 'case')
+        return false
+
+      if (this.isPointersLockActive) {
+        this.$refs.scene.slider.hidePointersLock()
+      } else {
+        this.$refs.scene.slider.showPointersLock()
+      }
+    },
     onSceneInit() {
       this.sceneInited = true
+
       this.$nextTick(() => {
         setTimeout(() => {
           this.$refs.preloader.animate()
@@ -98,7 +110,7 @@ export default {
     },
     showMenu() {
       new Promise(async resolve => {
-        if (this.isMenuActive) return false
+        if (this.isMenuActive || this.isPointersLockActive) return false
 
         this.isMenuActive = true
         await this.$refs.scene.slider.showMenu()
@@ -107,7 +119,7 @@ export default {
     },
     hideMenu() {
       new Promise(async resolve => {
-        if (!this.isMenuActive) return false
+        if (!this.isMenuActive || this.isPointersLockActive) return false
 
         await this.$refs.scene.slider.hideMenu()
         this.isMenuActive = false
@@ -115,8 +127,6 @@ export default {
       })
     },
     onMenuButtonClick(showMenu) {
-      // if (this.$route.name !== 'index') return false
-
       if (showMenu) {
         this.showMenu()
       } else {
@@ -124,7 +134,7 @@ export default {
       }
     },
     onShowreelBtnClick() {
-      if (this.isMenuActive) return false
+      if (this.isMenuActive || this.isPointersLockActive) return false
 
       this.isShowreelActive = true
     },

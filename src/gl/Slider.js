@@ -580,6 +580,49 @@ export default class Slider {
     this.play()
   }
 
+  showPointersLock() {
+    return new Promise(resolve => {
+      if (!this.moving && !this.inMenu && this.insideSphere.visible) {
+        this.lockControls.lock()
+        resolve()
+      } else {
+        resolve()
+      }
+    })
+  }
+
+  hidePointersLock() {
+    return new Promise(resolve => {
+      if (!this.moving && !this.inMenu && this.insideSphere.visible) {
+        this.moving = true
+        this.lockControls.unlock()
+
+        this.raycaster.setFromCamera(new THREE.Vector2(), this.insideCamera)
+        var intersect = this.raycaster.intersectObjects(this.scene.children)
+        let tempTarget = new THREE.Vector3(
+          intersect[0].point.x,
+          intersect[0].point.y,
+          intersect[0].point.z
+        )
+        TweenMax.to(tempTarget, 3, {
+          x: this.target.x,
+          y: this.target.y,
+          z: this.target.z,
+          ease: Power2.easeInOut,
+          onComplete: () => {
+            this.moving = false
+            resolve()
+          },
+          onUpdate: () => {
+            this.insideCamera.lookAt(tempTarget)
+          }
+        })
+      } else {
+        resolve()
+      }
+    })
+  }
+
   showMenu() {
     new Promise(resolve => {
       if (this.moving || this.inMenu) {
