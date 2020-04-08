@@ -582,9 +582,14 @@ export default class Slider {
 
   showMenu() {
     new Promise(resolve => {
-      this.moving = true
+      if (this.moving || this.inMenu) {
+        resolve()
+        return false
+      }
 
+      this.moving = true
       let newPos
+
       if (!this.insideSphere.visible) {
         newPos = new THREE.Vector3(
           this.camera.position.x,
@@ -594,95 +599,101 @@ export default class Slider {
         newPos.x *= 1.1
         newPos.z *= 1.1
         this.TGroup.scale.set(1, 1, 1)
+      } else {
+        newPos = new THREE.Vector3(
+          this.insideCamera.position.x,
+          100,
+          this.insideCamera.position.z
+        )
+        newPos.x *= -60.1
+        this.TGroup.scale.set(0.3, 0.3, 0.3)
 
-        let tmpControlBezier
+        this.TGroup.visible = true
+      }
+
+      let tmpControlBezier
+      if (!this.insideSphere.visible) {
         this.TGroup.position.set(newPos.x, 500, newPos.z)
         tmpControlBezier =
           this.index + 1 > this.arrOrbits.length - 1
             ? this.arrB[0].position
             : this.arrB[this.index + 1].position
-
-        let tmpfloat = { value: 0 }
-        let focusBezier = new THREE.QuadraticBezierCurve3(
-          this.insideSphere.visible
-            ? new THREE.Vector3(350, 20, 0)
-            : new THREE.Vector3(),
-          tmpControlBezier,
-          this.TGroup.position
-        )
-        this.TGroup.visible = true
-        this.about.material.uniforms.color.value = new THREE.Color(0xcbcbcb)
-        // this.contact.material.uniforms.color.value = new THREE.Color(0xcbcbcb)
-
-        TweenMax.to(tmpfloat, 2, {
-          value: 1,
-          ease: !this.insideSphere.visible ? Power2.easeOut : Power2.easeInOut,
-          onUpdate: () => {
-            if (this.insideSphere.visible) {
-              this.target.set(
-                focusBezier.getPointAt(tmpfloat.value).x,
-                focusBezier.getPointAt(tmpfloat.value).y,
-                focusBezier.getPointAt(tmpfloat.value).z
-              )
-            } else {
-              this.focus.set(
-                focusBezier.getPointAt(tmpfloat.value).x,
-                focusBezier.getPointAt(tmpfloat.value).y,
-                focusBezier.getPointAt(tmpfloat.value).z
-              )
-            }
-          },
-          onComplete: () => {
-            this.inMenu = true
-            this.moving = false
-            for (let i = 0; i < this.arrB.length; i++) {
-              this.arrB[i].visible = false
-            }
-            resolve()
-          }
-        })
-
-        TweenMax.to(this.insideSphere.material.uniforms.opacity, 2, {
-          value: !this.inMenu ? 0.2 : 1,
-          ease: Power2.easeInOut
-        })
       } else {
-        if (this.lockControls.isLocked) {
-          this.lockControls.unlock()
-          this.moving = true
-
-          this.raycaster.setFromCamera(new THREE.Vector2(), this.insideCamera)
-          var intersect = this.raycaster.intersectObjects(this.scene.children)
-          let tempTarget = new THREE.Vector3(
-            intersect[0].point.x,
-            intersect[0].point.y,
-            intersect[0].point.z
-          )
-          TweenMax.to(tempTarget, 3, {
-            x: this.target.x,
-            y: this.target.y,
-            z: this.target.z,
-            ease: Power2.easeInOut,
-            onComplete: () => {
-              this.moving = false
-            },
-            onUpdate: () => {
-              this.insideCamera.lookAt(tempTarget)
-            }
-          })
-        } else {
-          this.lockControls.lock()
-        }
+        this.TGroup.position.set(
+          newPos.x,
+          this.insideCamera.position.y,
+          newPos.z
+        )
+        tmpControlBezier = new THREE.Vector3(
+          -100,
+          this.insideCamera.position.y,
+          200
+        )
       }
+
+      let tmpfloat = { value: 0 }
+      let focusBezier = new THREE.QuadraticBezierCurve3(
+        this.insideSphere.visible
+          ? new THREE.Vector3(350, 20, 0)
+          : new THREE.Vector3(),
+        tmpControlBezier,
+        this.TGroup.position
+      )
+      this.TGroup.visible = true
+      this.about.material.uniforms.color.value = new THREE.Color(0xffffff)
+
+      TweenMax.to(tmpfloat, 2, {
+        value: 1,
+        ease: !this.insideSphere.visible ? Power2.easeOut : Power2.easeInOut,
+        onUpdate: () => {
+          if (this.insideSphere.visible) {
+            this.target.set(
+              focusBezier.getPointAt(tmpfloat.value).x,
+              focusBezier.getPointAt(tmpfloat.value).y,
+              focusBezier.getPointAt(tmpfloat.value).z
+            )
+            this.insideCamera.lookAt(this.target)
+          } else {
+            this.focus.set(
+              focusBezier.getPointAt(tmpfloat.value).x,
+              focusBezier.getPointAt(tmpfloat.value).y,
+              focusBezier.getPointAt(tmpfloat.value).z
+            )
+          }
+        },
+        onComplete: () => {
+          this.inMenu = true
+          this.moving = false
+          for (let i = 0; i < this.arrB.length; i++) {
+            this.arrB[i].visible = false
+          }
+          resolve()
+        }
+      })
+
+      TweenMax.to(this.insideSphere.material.uniforms.opacity, 2, {
+        value: !this.inMenu == true ? 0.2 : 1,
+        ease: Power2.easeInOut
+      })
     })
   }
 
   hideMenu() {
     new Promise(resolve => {
-      this.moving = true
+      if (this.moving || !this.inMenu) {
+        resolve()
+        return false
+      }
 
+      this.moving = true
       let tmpControlBezier
-      if (!this.insideSphere.visible) {
+      if (this.insideSphere.visible) {
+        tmpControlBezier = new THREE.Vector3(
+          100,
+          this.insideCamera.position.y,
+          200
+        )
+      } else {
         tmpControlBezier =
           this.index + 1 > this.arrOrbits.length - 1
             ? this.arrB[0].position
@@ -690,75 +701,48 @@ export default class Slider {
         for (let i = 0; i < this.arrB.length; i++) {
           this.arrB[i].visible = true
         }
-
-        let tmpfloat = { value: 0 }
-        let focusBezier = new THREE.QuadraticBezierCurve3(
-          this.TGroup.position,
-          tmpControlBezier,
-          this.insideSphere.visible
-            ? new THREE.Vector3(350, 20, 0)
-            : new THREE.Vector3()
-        )
-
-        TweenMax.to(tmpfloat, 2, {
-          value: 1,
-          ease: Power2.easeInOut,
-          onUpdate: () => {
-            if (this.insideSphere.visible) {
-              this.target.set(
-                focusBezier.getPointAt(tmpfloat.value).x,
-                focusBezier.getPointAt(tmpfloat.value).y,
-                focusBezier.getPointAt(tmpfloat.value).z
-              )
-            } else {
-              this.focus.set(
-                focusBezier.getPointAt(tmpfloat.value).x,
-                focusBezier.getPointAt(tmpfloat.value).y,
-                focusBezier.getPointAt(tmpfloat.value).z
-              )
-            }
-          },
-          onComplete: () => {
-            this.TGroup.visible = false
-            this.inMenu = false
-            this.moving = false
-            resolve()
-          }
-        })
-
-        TweenMax.to(this.insideSphere.material.uniforms.opacity, 2, {
-          value: !this.inMenu ? 0.2 : 1,
-          ease: Power2.easeInOut
-        })
-      } else {
-        this.lockControls.unlock()
-        this.moving = true
-
-        this.raycaster.setFromCamera(new THREE.Vector2(), this.insideCamera)
-        var intersect = this.raycaster.intersectObjects(this.scene.children)
-        let tempTarget = new THREE.Vector3(
-          intersect[0].point.x,
-          intersect[0].point.y,
-          intersect[0].point.z
-        )
-        TweenMax.to(tempTarget, 3, {
-          x: this.target.x,
-          y: this.target.y,
-          z: this.target.z,
-          ease: Power2.easeInOut,
-          onComplete: () => {
-            this.moving = false
-            this.lockControls.unlock()
-          },
-          onUpdate: () => {
-            this.insideCamera.lookAt(tempTarget)
-          }
-        })
-        // if (this.lockControls.isLocked) {
-        // } else {
-        //   this.lockControls.lock()
-        // }
       }
+
+      let tmpfloat = { value: 0 }
+      let focusBezier = new THREE.QuadraticBezierCurve3(
+        this.TGroup.position,
+        tmpControlBezier,
+        this.insideSphere.visible
+          ? new THREE.Vector3(350, 20, 0)
+          : new THREE.Vector3()
+      )
+
+      TweenMax.to(tmpfloat, 2, {
+        value: 1,
+        ease: Power2.easeInOut,
+        onUpdate: () => {
+          if (this.insideSphere.visible) {
+            this.target.set(
+              focusBezier.getPointAt(tmpfloat.value).x,
+              focusBezier.getPointAt(tmpfloat.value).y,
+              focusBezier.getPointAt(tmpfloat.value).z
+            )
+            this.insideCamera.lookAt(this.target)
+          } else {
+            this.focus.set(
+              focusBezier.getPointAt(tmpfloat.value).x,
+              focusBezier.getPointAt(tmpfloat.value).y,
+              focusBezier.getPointAt(tmpfloat.value).z
+            )
+          }
+        },
+        onComplete: () => {
+          this.TGroup.visible = false
+          this.inMenu = false
+          this.moving = false
+          resolve()
+        }
+      })
+
+      TweenMax.to(this.insideSphere.material.uniforms.opacity, 2, {
+        value: !this.inMenu == true ? 0.2 : 1,
+        ease: Power2.easeInOut
+      })
     })
   }
 
