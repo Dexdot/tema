@@ -1,5 +1,5 @@
 <template>
-  <div id="app" @keydown="onKeydown">
+  <div id="app">
     <ul :class="['social', { 'social--visible': isMenuActive }]">
       <li>
         <a href="https://www.behance.net/artartem" class="u-center">
@@ -63,6 +63,7 @@ export default {
   data: () => ({
     sceneInited: false,
     mounted: false,
+    isSpacebarPressed: false,
     isPointersLockActive: false,
     isShowreelActive: false,
     isMenuActive: false,
@@ -71,7 +72,9 @@ export default {
   }),
   computed: {
     hideContent() {
-      return this.$route.name === 'index' ? false : this.isMenuActive
+      return this.$route.name === 'index'
+        ? false
+        : this.isMenuActive || this.isPointersLockActive
     }
   },
   mounted() {
@@ -82,18 +85,34 @@ export default {
     })
   },
   methods: {
+    handlePointersLock() {
+      document.addEventListener('keydown', this.onKeydown.bind(this))
+      this.$refs.scene.slider.lockControls.addEventListener('unlock', () => {
+        if (
+          this.isSpacebarPressed ||
+          this.isMenuActive ||
+          this.$route.name !== 'case'
+        )
+          return false
+
+        this.hidePointersLock()
+      })
+    },
     onKeydown({ keyCode }) {
       if (keyCode !== 32 || this.isMenuActive || this.$route.name !== 'case')
         return false
 
+      this.isSpacebarPressed = true
       if (this.isPointersLockActive) {
-        this.$refs.scene.slider.hidePointersLock()
+        this.hidePointersLock()
       } else {
-        this.$refs.scene.slider.showPointersLock()
+        this.showPointersLock()
       }
     },
     onSceneInit() {
       this.sceneInited = true
+
+      this.handlePointersLock()
 
       this.$nextTick(() => {
         setTimeout(() => {
@@ -108,6 +127,26 @@ export default {
         this.$refs.scene.slider.firstAnim()
       }
     },
+    showPointersLock() {
+      new Promise(async resolve => {
+        if (this.isMenuActive) return false
+
+        this.isPointersLockActive = true
+        await this.$refs.scene.slider.showPointersLock()
+        this.isSpacebarPressed = false
+        resolve()
+      })
+    },
+    hidePointersLock() {
+      new Promise(async resolve => {
+        if (this.isMenuActive) return false
+
+        await this.$refs.scene.slider.hidePointersLock()
+        this.isPointersLockActive = false
+        this.isSpacebarPressed = false
+        resolve()
+      })
+    },
     showMenu() {
       new Promise(async resolve => {
         if (this.isMenuActive || this.isPointersLockActive) return false
@@ -120,6 +159,9 @@ export default {
     hideMenu() {
       new Promise(async resolve => {
         if (!this.isMenuActive || this.isPointersLockActive) return false
+
+        const menuBtn = document.querySelector('button.circles')
+        menuBtn.blur()
 
         await this.$refs.scene.slider.hideMenu()
         this.isMenuActive = false

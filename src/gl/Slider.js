@@ -540,19 +540,20 @@ export default class Slider {
               /*СВАЙП ВПРАВО*/
               this.indexControl('next')
             }
-          } else {
-            //
-            if (
-              !this.moving &&
-              this.finalPoint.pageY < this.initialPoint.pageY
-            ) {
-              if (!this.inMenu) {
-                this.showMenu()
-              } else {
-                this.hideMenu()
-              }
-            }
           }
+          // else {
+          //   //
+          //   if (
+          //     !this.moving &&
+          //     this.finalPoint.pageY < this.initialPoint.pageY
+          //   ) {
+          //     if (!this.inMenu) {
+          //       this.showMenu()
+          //     } else {
+          //       this.hideMenu()
+          //     }
+          //   }
+          // }
         } else {
           event.target.click()
           event.preventDefault()

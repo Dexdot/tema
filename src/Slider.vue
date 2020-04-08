@@ -21,7 +21,7 @@ const images = {}
 
 export default {
   name: 'Slider',
-  props: ['detect', 'isMenuActive'],
+  props: ['detect'],
   data: () => ({
     index: 0,
     inited: false,
