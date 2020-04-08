@@ -240,15 +240,20 @@ body:not(.scrollable)
 .social
   z-index: 1
   position: fixed
-  top: 50%
   right: var(--unit-h)
-  transform: translateY(-50%)
 
   opacity: 0
   pointer-events: none
   user-select: none
 
   transition: opacity 0.25s ease
+
+  @media (min-width: 501px)
+    top: 50%
+    transform: translateY(-50%)
+
+  @media (max-width: 500px)
+    bottom: 16vh
 
 .social--visible
   opacity: 1

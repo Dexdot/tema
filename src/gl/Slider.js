@@ -142,7 +142,7 @@ export default class Slider {
     this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.setSize(window.innerWidth, h)
 
-    this.adapt()
+    // this.adapt()
   }
 
   play() {
@@ -331,7 +331,6 @@ export default class Slider {
       })
       let meshB = new THREE.Mesh(this.bigtestgeometry, meshBMaterial)
 
-      //meshBMaterial.maxScaleHover = meshBMaterial.uniforms.uWiggleScale.value+0.075;
       let x = Math.cos((2 * Math.PI * i) / 7) * 6000 + 0
       let y = Math.sin((2 * Math.PI * i) / 7) * 6000 + 0
 
@@ -360,7 +359,6 @@ export default class Slider {
           Math.sin((2 * Math.PI * i) / 7) * 8000
         )
       )
-      //let material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
 
       let LCurveControlVector = new THREE.Vector3(
         Math.cos((2 * Math.PI * (i + 0.5)) / 7) * 10000 + 0,
@@ -375,17 +373,12 @@ export default class Slider {
         )
       )
 
-      // let points = this.arrOrbits[i].getPoints(50);
-      // let geometry = new THREE.BufferGeometry().setFromPoints( points );
-      // let curveObject = new THREE.Line( geometry, material );
-      // this.scene.add(curveObject);
       this.arrCurves.push(LCurveControlVector)
       meshB.name = i + ''
       meshB.position.set(x, 300, y)
       meshB.lookAt(this.scene.position)
 
       this.arrB.push(meshB)
-
       this.scene.add(meshB)
     }
     this.material = new THREE.ShaderMaterial({
@@ -541,19 +534,6 @@ export default class Slider {
               this.indexControl('next')
             }
           }
-          // else {
-          //   //
-          //   if (
-          //     !this.moving &&
-          //     this.finalPoint.pageY < this.initialPoint.pageY
-          //   ) {
-          //     if (!this.inMenu) {
-          //       this.showMenu()
-          //     } else {
-          //       this.hideMenu()
-          //     }
-          //   }
-          // }
         } else {
           event.target.click()
           event.preventDefault()
@@ -631,6 +611,8 @@ export default class Slider {
         return false
       }
 
+      this.adapt()
+
       this.moving = true
       let newPos
 
@@ -642,7 +624,7 @@ export default class Slider {
         )
         newPos.x *= 1.1
         newPos.z *= 1.1
-        this.TGroup.scale.set(1, 1, 1)
+        // this.TGroup.scale.set(1, 1, 1);
       } else {
         newPos = new THREE.Vector3(
           this.insideCamera.position.x,
@@ -650,7 +632,9 @@ export default class Slider {
           this.insideCamera.position.z
         )
         newPos.x *= -60.1
-        this.TGroup.scale.set(0.3, 0.3, 0.3)
+
+        const scaleNum = this.mobile ? 0.2 : 0.3
+        this.TGroup.scale.set(scaleNum, scaleNum, scaleNum)
 
         this.TGroup.visible = true
       }
@@ -793,10 +777,14 @@ export default class Slider {
   adapt() {
     if (window.innerWidth <= 1024) {
       this.adaptMode = true
+      this.TGroup.scale.set(0.7, 0.7, 0.7)
+      this.tittleAbout.position.x = -500
+      this.tittleAbout.position.y = 900
 
-      this.contact.p.position.x = 0
-      this.about.position.x = -380
-      this.contact.position.x = -380
+      this.about.position.x = -500
+      this.about.position.y = 300
+      this.contact.position.x = -500
+      this.contact.position.y = -600
 
       if (!this.inMenu || !this.insideSphere) {
         for (let i = 0; i < this.arrB.length; i++) {
@@ -807,8 +795,11 @@ export default class Slider {
       }
     } else {
       this.adaptMode = false
+      this.tittleAbout.position.x = -1000
+      this.tittleAbout.position.y = 300
+      this.TGroup.scale.set(1, 1, 1)
 
-      this.contact.p.position.x = -265
+      this.contact.p.position.x = 265
       this.about.position.x = -100
       this.contact.position.x = -100
 
@@ -893,13 +884,6 @@ export default class Slider {
   & Creative
        director`
 
-    // const text2 =
-    //   // prettier-ignore
-    //   `Interactive
-    //         designer
-    //     & Creative
-    //         director`
-
     let geometry2 = new THREE.TextBufferGeometry(text2, {
       font: font,
       size: 80,
@@ -911,6 +895,24 @@ export default class Slider {
       bevelOffset: 0,
       bevelSegments: 5
     })
+
+    let mobileGeometry2 = new THREE.TextBufferGeometry(
+      `Interactive
+designer
+& Creative
+director`,
+      {
+        font: font,
+        size: 90,
+        height: 1,
+        curveSegments: 12,
+        bevelEnabled: false,
+        bevelThickness: 10,
+        bevelSize: 8,
+        bevelOffset: 0,
+        bevelSegments: 5
+      }
+    )
 
     geometry1.merge(line.geometry)
 
@@ -924,7 +926,10 @@ export default class Slider {
     this.contact.name = 'contact'
     this.contact.add(line)
 
-    this.tittleAbout = new THREE.Mesh(geometry2, oceanMaterial2.clone())
+    this.tittleAbout = new THREE.Mesh(
+      this.mobile ? mobileGeometry2 : geometry2,
+      oceanMaterial2.clone()
+    )
     this.tittleAbout.name = `tittleAbout`
 
     this.oceanText = new THREE.Mesh(oceanGeometry, oceanMaterial)
@@ -935,6 +940,7 @@ export default class Slider {
 
     const lightFontJson = require('@/assets/fonts/Woodland-Light.json')
     const lightFont = new THREE.Font(lightFontJson)
+    this.font2 = lightFont
 
     let geometry = new THREE.TextBufferGeometry(
       `Hi, I'm Artem Sokolov, a Russian
@@ -961,7 +967,36 @@ inquires or just drop me a message.`,
       }
     )
 
-    this.about = new THREE.Mesh(geometry, this.contact.material.clone())
+    let mobileGeometry = new THREE.TextBufferGeometry(
+      `Hi, I'm Artem Sokolov, a Russian digital
+designer and art director based in Saint
+Petersburg. I’ve been working in the
+digital area for more than 4 years. My work
+has been varied – from branding, apps,
+UX/UI, websites and digital tools – but
+always with a human-centered approach
+and a keen eye for detail. My work has
+been recognized on Awwwards, CSSDA
+and many more. Let's get in touch, for any
+project inquires or just drop me a
+message.`,
+      {
+        font: lightFont,
+        size: 40,
+        height: 1,
+        curveSegments: 12,
+        bevelEnabled: false,
+        bevelThickness: 10,
+        bevelSize: 8,
+        bevelOffset: 0,
+        bevelSegments: 5
+      }
+    )
+
+    this.about = new THREE.Mesh(
+      this.mobile ? mobileGeometry : geometry,
+      this.contact.material.clone()
+    )
     this.about.name = 'about'
     this.about.material.uniforms.color.value = new THREE.Color(0xcccccc)
     resCounter++
