@@ -596,60 +596,56 @@ export default class Slider {
         this.TGroup.scale.set(1, 1, 1)
 
         let tmpControlBezier
-        if (!this.insideSphere.visible) {
-          this.TGroup.position.set(newPos.x, 500, newPos.z)
-          tmpControlBezier =
-            this.index + 1 > this.arrOrbits.length - 1
-              ? this.arrB[0].position
-              : this.arrB[this.index + 1].position
+        this.TGroup.position.set(newPos.x, 500, newPos.z)
+        tmpControlBezier =
+          this.index + 1 > this.arrOrbits.length - 1
+            ? this.arrB[0].position
+            : this.arrB[this.index + 1].position
 
-          let tmpfloat = { value: 0 }
-          let focusBezier = new THREE.QuadraticBezierCurve3(
-            this.insideSphere.visible
-              ? new THREE.Vector3(350, 20, 0)
-              : new THREE.Vector3(),
-            tmpControlBezier,
-            this.TGroup.position
-          )
-          this.TGroup.visible = true
-          this.about.material.uniforms.color.value = new THREE.Color(0xcbcbcb)
-          // this.contact.material.uniforms.color.value = new THREE.Color(0xcbcbcb)
+        let tmpfloat = { value: 0 }
+        let focusBezier = new THREE.QuadraticBezierCurve3(
+          this.insideSphere.visible
+            ? new THREE.Vector3(350, 20, 0)
+            : new THREE.Vector3(),
+          tmpControlBezier,
+          this.TGroup.position
+        )
+        this.TGroup.visible = true
+        this.about.material.uniforms.color.value = new THREE.Color(0xcbcbcb)
+        // this.contact.material.uniforms.color.value = new THREE.Color(0xcbcbcb)
 
-          TweenMax.to(tmpfloat, 2, {
-            value: 1,
-            ease: !this.insideSphere.visible
-              ? Power2.easeOut
-              : Power2.easeInOut,
-            onUpdate: () => {
-              if (this.insideSphere.visible) {
-                this.target.set(
-                  focusBezier.getPointAt(tmpfloat.value).x,
-                  focusBezier.getPointAt(tmpfloat.value).y,
-                  focusBezier.getPointAt(tmpfloat.value).z
-                )
-              } else {
-                this.focus.set(
-                  focusBezier.getPointAt(tmpfloat.value).x,
-                  focusBezier.getPointAt(tmpfloat.value).y,
-                  focusBezier.getPointAt(tmpfloat.value).z
-                )
-              }
-            },
-            onComplete: () => {
-              this.inMenu = true
-              this.moving = false
-              for (let i = 0; i < this.arrB.length; i++) {
-                this.arrB[i].visible = false
-              }
-              resolve()
+        TweenMax.to(tmpfloat, 2, {
+          value: 1,
+          ease: !this.insideSphere.visible ? Power2.easeOut : Power2.easeInOut,
+          onUpdate: () => {
+            if (this.insideSphere.visible) {
+              this.target.set(
+                focusBezier.getPointAt(tmpfloat.value).x,
+                focusBezier.getPointAt(tmpfloat.value).y,
+                focusBezier.getPointAt(tmpfloat.value).z
+              )
+            } else {
+              this.focus.set(
+                focusBezier.getPointAt(tmpfloat.value).x,
+                focusBezier.getPointAt(tmpfloat.value).y,
+                focusBezier.getPointAt(tmpfloat.value).z
+              )
             }
-          })
+          },
+          onComplete: () => {
+            this.inMenu = true
+            this.moving = false
+            for (let i = 0; i < this.arrB.length; i++) {
+              this.arrB[i].visible = false
+            }
+            resolve()
+          }
+        })
 
-          TweenMax.to(this.insideSphere.material.uniforms.opacity, 2, {
-            value: !this.inMenu ? 0.2 : 1,
-            ease: Power2.easeInOut
-          })
-        }
+        TweenMax.to(this.insideSphere.material.uniforms.opacity, 2, {
+          value: !this.inMenu ? 0.2 : 1,
+          ease: Power2.easeInOut
+        })
       } else {
         if (this.lockControls.isLocked) {
           this.lockControls.unlock()
