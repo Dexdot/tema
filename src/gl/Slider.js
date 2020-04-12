@@ -782,7 +782,7 @@ export default class Slider {
       this.tittleAbout.position.y = 900
 
       this.about.position.x = -500
-      this.about.position.y = 250
+      this.about.position.y = 300
       this.contact.position.x = -500
       this.contact.position.y = -600
 
