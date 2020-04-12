@@ -37,6 +37,8 @@
       </transition>
     </div>
 
+    <CursorCircle :hidden="isPointersLockActive" v-if="showCursor" />
+
     <Showreel
       :active="isShowreelActive"
       @showreel-close="isShowreelActive = false"
@@ -50,6 +52,7 @@ import Preloader from '@/Preloader'
 import Showreel from '@/Showreel'
 import Slider from '@/Slider'
 import Main from '@/Main.vue'
+import CursorCircle from '@/CursorCircle'
 import { detectDevices } from '@/scripts/detect'
 
 export default {
@@ -58,7 +61,8 @@ export default {
     Preloader,
     Showreel,
     Slider,
-    Main
+    Main,
+    CursorCircle
   },
   data: () => ({
     sceneInited: false,
@@ -70,6 +74,13 @@ export default {
     detect: {}
   }),
   computed: {
+    showCursor() {
+      return (
+        this.sceneInited &&
+        this.$route.name === 'case' &&
+        !this.detect.isMobileDevice
+      )
+    },
     hideContent() {
       return this.$route.name === 'index'
         ? false
@@ -80,7 +91,7 @@ export default {
     this.$nextTick(() => {
       this.mounted = true
 
-      detectDevices()
+      this.detect = detectDevices()
     })
   },
   methods: {
@@ -90,11 +101,13 @@ export default {
 
       document.addEventListener('mousedown', () => {
         if (!slider.inMenu && slider.insideSphere.visible && !slider.moving) {
-          slider.sphereAnim = TweenMax.to(slider, 3, { time: 10.34 })
+          slider.sphereAnim = TweenMax.to(slider, 2, { time: 10.34 })
+          this.fillCursor()
+
           slider.timer = setTimeout(() => {
             slider.timer = clearTimeout(slider.timer)
             this.showPointersLock()
-          }, 3000)
+          }, 2000)
         }
       })
 
@@ -103,8 +116,17 @@ export default {
           slider.sphereAnim = TweenMax.to(slider, 1, { time: 10.32 })
           slider.timer = clearTimeout(slider.timer)
           this.hidePointersLock()
+          this.unfillCursor()
         }
       })
+    },
+    fillCursor() {
+      const { TweenMax, Power2 } = window
+      TweenMax.to('.cursor__inner', 2, { scale: 1, ease: Power2.easeInOut })
+    },
+    unfillCursor() {
+      const { TweenMax, Power2 } = window
+      TweenMax.to('.cursor__inner', 1, { scale: 0, ease: Power2.easeIn })
     },
     onSceneInit() {
       this.sceneInited = true
