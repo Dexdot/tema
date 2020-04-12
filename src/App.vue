@@ -97,6 +97,7 @@ export default {
     this.$nextTick(() => {
       this.mounted = true
 
+      window.$app = this
       this.detect = detectDevices()
     })
   },
@@ -105,7 +106,11 @@ export default {
       const { slider } = this.$refs.scene
       const { TweenMax } = window
 
-      document.addEventListener('mousedown', () => {
+      document.addEventListener('mousedown', e => {
+        const closestBtn = e.target.closest('button')
+        const closestLink = e.target.closest('a')
+        if (closestBtn || closestLink) return false
+
         this.isMousePressed = true
 
         if (!slider.inMenu && slider.insideSphere.visible && !slider.moving) {
@@ -119,7 +124,11 @@ export default {
         }
       })
 
-      document.addEventListener('mouseup', () => {
+      document.addEventListener('mouseup', e => {
+        const closestBtn = e.target.closest('button')
+        const closestLink = e.target.closest('a')
+        if (closestBtn || closestLink) return false
+
         this.isMousePressed = false
 
         if (!slider.inMenu && slider.insideSphere.visible && !slider.moving) {
