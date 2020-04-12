@@ -5,6 +5,7 @@
         <span>{{ content.title }}</span>
       </h1>
     </div>
+    <div class="case__cursor-text">Click and hold</div>
 
     <div
       class="case__container"
@@ -47,6 +48,8 @@
         </div>
       </div>
     </div>
+    <router-link class="case__back case__back--left" to="/"></router-link>
+    <router-link class="case__back case__back--right" to="/">Close</router-link>
 
     <Next @complete="$router.push('/')" />
   </article>
@@ -162,25 +165,42 @@ export default {
   position: relative
   padding-top: 101vh
 
+.case__back
+  &,
+  &:visited,
+  &:active,
+  &:focus
+    color: #fff
+
+.case__back
+  position: fixed
+  top: 80px
+  height: calc(100vh - 160px)
+  width: 12.1vw
+
+  display: flex
+  align-items: center
+  justify-content: center
+
+  writing-mode: vertical-lr
+  transform: scale(-1)
+  opacity: 0
+
+  &--left
+    left: 0
+    padding-left: var(--unit-h)
+
+  &--right
+    right: 0
+    padding-right: var(--unit-h)
+
+  @media (max-width: 800px)
+    display: none
+
 .case__fixed
   position: fixed
   top: 50vh
   left: 50%
-
-// body.is-safari,
-// body.is-mob
-//   .case__fixed
-//     position: fixed
-//     top: 0
-//     left: 0
-//     transform: unset !important
-//     width: 100vw
-//     height: 100vh
-
-//     .case__title
-//       position: absolute
-//       top: 50%
-//       left: 50%
 
 body.is-mob .case__fixed
   top: calc(var(--initial-vh) * 50)
@@ -202,6 +222,15 @@ body.is-mob .case__fixed
     will-change: transform
     &.is-space
       min-width: 0.3em
+
+.case__cursor-text
+  position: fixed
+  top: calc(var(--vh, 1vh) * 100 - 80px)
+  left: 50%
+  transform: translate(-50%, 50%)
+
+  text-align: center
+  opacity: 0
 
 .case__caption
   position: relative

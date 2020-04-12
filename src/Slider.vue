@@ -101,7 +101,7 @@ export default {
     caseEnter() {
       // Container
       anime({
-        targets: '.case__container',
+        targets: '.case__back, .case__cursor-text, .case__container',
         duration: 800,
         easing: 'easeOutCubic',
         opacity: [0, 1]
@@ -138,7 +138,8 @@ export default {
       if (!this.slider.RAF) this.slider.play()
 
       anime({
-        targets: '.case__title, .case__container, .next',
+        targets:
+          '.case__back, .case__cursor-text, .case__title, .case__container, .next',
         duration: 600,
         easing: 'easeInCubic',
         opacity: [1, 0]
