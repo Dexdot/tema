@@ -37,7 +37,7 @@
       </transition>
     </div>
 
-    <CursorCircle :hidden="isPointersLockActive" v-if="showCursor" />
+    <CursorCircle :hidden="hideCursor" v-if="useCursor" />
 
     <Showreel
       :active="isShowreelActive"
@@ -55,6 +55,8 @@ import Main from '@/Main.vue'
 import CursorCircle from '@/CursorCircle'
 import { detectDevices } from '@/scripts/detect'
 
+import drawSvg from '@/scripts/draw-svg'
+
 export default {
   name: 'App',
   components: {
@@ -67,6 +69,7 @@ export default {
   data: () => ({
     sceneInited: false,
     mounted: false,
+    isMousePressed: false,
     isPointersLockActive: false,
     isShowreelActive: false,
     isMenuActive: false,
@@ -74,7 +77,10 @@ export default {
     detect: {}
   }),
   computed: {
-    showCursor() {
+    hideCursor() {
+      return !this.isMousePressed || this.isPointersLockActive
+    },
+    useCursor() {
       return (
         this.sceneInited &&
         this.$route.name === 'case' &&
@@ -100,6 +106,8 @@ export default {
       const { TweenMax } = window
 
       document.addEventListener('mousedown', () => {
+        this.isMousePressed = true
+
         if (!slider.inMenu && slider.insideSphere.visible && !slider.moving) {
           slider.sphereAnim = TweenMax.to(slider, 2, { time: 10.34 })
           this.fillCursor()
@@ -112,6 +120,8 @@ export default {
       })
 
       document.addEventListener('mouseup', () => {
+        this.isMousePressed = false
+
         if (!slider.inMenu && slider.insideSphere.visible && !slider.moving) {
           slider.sphereAnim = TweenMax.to(slider, 1, { time: 10.32 })
           slider.timer = clearTimeout(slider.timer)
@@ -121,12 +131,25 @@ export default {
       })
     },
     fillCursor() {
-      const { TweenMax, Power2 } = window
-      TweenMax.to('.cursor__inner', 2, { scale: 1, ease: Power2.easeInOut })
+      const el = document.querySelector('.cursor__inner circle:last-child')
+      drawSvg({
+        el,
+        duration: 2,
+        options: {
+          ease: window.Power2.easeInOut
+        }
+      })
     },
     unfillCursor() {
-      const { TweenMax, Power2 } = window
-      TweenMax.to('.cursor__inner', 1, { scale: 0, ease: Power2.easeIn })
+      const el = document.querySelector('.cursor__inner circle:last-child')
+      drawSvg({
+        el,
+        duration: 1,
+        options: {
+          ease: window.Power2.easeInOut,
+          length: 0
+        }
+      })
     },
     onSceneInit() {
       this.sceneInited = true

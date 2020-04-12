@@ -1,7 +1,6 @@
 <template>
   <section class="next">
     <div class="next-circle" v-show="showCircle">
-      <!-- <span class="next-circle-text">Back</span> -->
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
         <circle
           cx="36"
@@ -99,15 +98,6 @@ export default {
 
   width: 100vw
   height: 101vh
-
-.next-circle-text
-  color: #fff
-  display: block
-
-  position: absolute
-  top: 50%
-  left: 50%
-  transform: translate(-50%, -50%)
 
 .next-circle,
 .next-circle svg

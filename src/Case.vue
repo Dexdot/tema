@@ -182,6 +182,7 @@ export default {
   align-items: center
   justify-content: center
 
+  font-size: 12px
   writing-mode: vertical-lr
   transform: scale(-1)
   opacity: 0
@@ -229,6 +230,8 @@ body.is-mob .case__fixed
   left: 50%
   transform: translate(-50%, 50%)
 
+  font-size: 12px
+  color: rgba(#fff, 0.5)
   text-align: center
   opacity: 0
 

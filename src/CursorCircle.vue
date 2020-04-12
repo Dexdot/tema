@@ -1,6 +1,26 @@
 <template>
   <div :class="['cursor', { 'cursor--hidden': hidden }]">
-    <div class="cursor__inner"></div>
+    <div class="cursor__inner">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
+        <circle
+          cx="36"
+          cy="36"
+          r="35"
+          fill="none"
+          stroke-miterlimit="10"
+          stroke-width="2"
+        ></circle>
+        <circle
+          cx="36"
+          cy="36"
+          r="35"
+          fill="none"
+          stroke-miterlimit="10"
+          stroke-width="2"
+          ref="circle"
+        ></circle>
+      </svg>
+    </div>
   </div>
 </template>
 
@@ -14,7 +34,7 @@ export default {
   },
   data: () => ({
     RAF: 0,
-    size: 24,
+    size: 36,
     styles: {
       x: 0,
       y: 0
@@ -53,34 +73,36 @@ export default {
 
 <style lang="sass" scoped>
 .cursor
-  display: flex
-  align-items: center
-  justify-content: center
-  width: 48px
-  height: 48px
-
   position: fixed
   z-index: 2
   top: 0
   left: 0
 
-  transform-origin: 50% 50%
-  will-change: transform
-
-  border: 1px solid #fff
-  border-radius: 50%
   pointer-events: none
   transition: opacity 0.25s ease
 
 .cursor--hidden
   opacity: 0
 
-.cursor__inner
-  width: 100%
-  height: 100%
+.cursor__inner,
+.cursor
+  display: flex
+  align-items: center
+  justify-content: center
 
-  border-radius: 50%
-  background: #fff
-  transform-origin: 50% 50%
-  transform: scale(0)
+
+.cursor__inner,
+.cursor__inner svg
+  width: 72px
+  height: 72px
+
+  circle
+    stroke: #fff
+
+    &:first-child
+      stroke-dasharray: 219.556
+      opacity: 0.3
+
+    &:last-child
+      stroke-dasharray: 0 219.556
 </style>
