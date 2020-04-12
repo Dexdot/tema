@@ -63,7 +63,6 @@ export default {
   data: () => ({
     sceneInited: false,
     mounted: false,
-    isSpacebarPressed: false,
     isPointersLockActive: false,
     isShowreelActive: false,
     isMenuActive: false,
@@ -86,28 +85,26 @@ export default {
   },
   methods: {
     handlePointersLock() {
-      document.addEventListener('keydown', this.onKeydown.bind(this))
-      this.$refs.scene.slider.lockControls.addEventListener('unlock', () => {
-        if (
-          this.isSpacebarPressed ||
-          this.isMenuActive ||
-          this.$route.name !== 'case'
-        )
-          return false
+      const { slider } = this.$refs.scene
+      const { TweenMax } = window
 
-        this.hidePointersLock()
+      document.addEventListener('mousedown', () => {
+        if (!slider.inMenu && slider.insideSphere.visible && !slider.moving) {
+          slider.sphereAnim = TweenMax.to(slider, 3, { time: 10.34 })
+          slider.timer = setTimeout(() => {
+            slider.timer = clearTimeout(slider.timer)
+            this.showPointersLock()
+          }, 3000)
+        }
       })
-    },
-    onKeydown({ keyCode }) {
-      if (keyCode !== 32 || this.isMenuActive || this.$route.name !== 'case')
-        return false
 
-      this.isSpacebarPressed = true
-      if (this.isPointersLockActive) {
-        this.hidePointersLock()
-      } else {
-        this.showPointersLock()
-      }
+      document.addEventListener('mouseup', () => {
+        if (!slider.inMenu && slider.insideSphere.visible && !slider.moving) {
+          slider.sphereAnim = TweenMax.to(slider, 1, { time: 10.32 })
+          slider.timer = clearTimeout(slider.timer)
+          this.hidePointersLock()
+        }
+      })
     },
     onSceneInit() {
       this.sceneInited = true
@@ -133,7 +130,6 @@ export default {
 
         this.isPointersLockActive = true
         await this.$refs.scene.slider.showPointersLock()
-        this.isSpacebarPressed = false
         resolve()
       })
     },
@@ -143,7 +139,6 @@ export default {
 
         await this.$refs.scene.slider.hidePointersLock()
         this.isPointersLockActive = false
-        this.isSpacebarPressed = false
         resolve()
       })
     },
