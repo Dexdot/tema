@@ -29,12 +29,17 @@ export default {
   }),
   computed: {
     num() {
-      return this.inited ? `0${this.index + 1}` : ''
+      const index = this.index === 0 ? this.sliderLength : this.index
+      const i = this.sliderLength - index
+      const num = this.inited ? `0${i + 1}` : ''
+
+      return num
     },
     len() {
-      return this.inited
-        ? `0${Object.keys(this.slider.sceneParams).length}`
-        : ''
+      return this.inited ? `0${this.sliderLength}` : ''
+    },
+    sliderLength() {
+      return Object.keys(this.slider.sceneParams).length
     }
   },
   mounted() {

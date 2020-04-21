@@ -854,18 +854,18 @@ export default class Slider {
     let linepoints = []
     linepoints.push(new THREE.Vector3(0, -45, 0))
     linepoints.push(new THREE.Vector3(0, -50, 0))
-    linepoints.push(new THREE.Vector3(560, -50, 0))
+    linepoints.push(new THREE.Vector3(840, -50, 0))
 
     linepoints.push(new THREE.Vector3(0, -45, 0))
-    linepoints.push(new THREE.Vector3(560, -45, 0))
-    linepoints.push(new THREE.Vector3(560, -50, 0))
+    linepoints.push(new THREE.Vector3(840, -45, 0))
+    linepoints.push(new THREE.Vector3(840, -50, 0))
 
     let line = new THREE.Line(
       new THREE.BufferGeometry().setFromPoints(linepoints),
       linematerial
     )
 
-    let geometry1 = new THREE.TextBufferGeometry(`Feel free to mail me`, {
+    let geometry1 = new THREE.TextBufferGeometry(`artemartsokolov@gmail.com`, {
       font: font,
       size: 40,
       height: 1,
@@ -1357,10 +1357,10 @@ message.`,
         if (!this.moving && this.newTime - this.oldTime > 550) {
           if (direction < 0) {
             // swipe down
-            this.indexControl('next')
+            this.indexControl('back')
           } else {
             // swipe up
-            this.indexControl('back')
+            this.indexControl('next')
           }
           setTimeout(function() {
             this.oldTime = new Date().getTime()

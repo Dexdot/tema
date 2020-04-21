@@ -122,7 +122,7 @@ export default {
 
 .play
   position: fixed
-  top: calc(var(--vh, 1vh) * 100 - 80px)
+  top: calc(var(--vh, 1vh) * 100 - 70px)
   left: 0
 
   padding-left: var(--unit-h)
