@@ -37,7 +37,13 @@ export default {
     showCircle: false
   }),
   mounted() {
-    this.observe()
+    setTimeout(() => {
+      this.observe()
+    }, 5000)
+  },
+  beforeDestroy() {
+    if (this.observer) this.observer.unobserve(this.$el)
+    this.stopCount()
   },
   methods: {
     startCount() {
@@ -52,6 +58,7 @@ export default {
             onComplete: () => {
               const t2 = setTimeout(() => {
                 this.isAnimating = false
+                this.observer.unobserve(this.$el)
                 this.$emit('complete')
               }, 600)
               this.timers.push(t2)
@@ -69,7 +76,7 @@ export default {
       this.isAnimating = false
     },
     observe() {
-      const observer = new IntersectionObserver(
+      this.observer = new IntersectionObserver(
         entries => {
           entries.forEach(entry => {
             this.showCircle = entry.isIntersecting
@@ -85,7 +92,8 @@ export default {
         },
         { threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1] }
       )
-      observer.observe(this.$el)
+
+      this.observer.observe(this.$el)
     }
   }
 }
@@ -107,7 +115,7 @@ export default {
 .next-circle
   position: fixed
   top: 50%
-  left: 50%
+  left: 50vw
   transform: translate(-50%, -50%)
 
   text-align: center

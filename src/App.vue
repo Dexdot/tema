@@ -96,8 +96,6 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.mounted = true
-
-      window.$app = this
       this.detect = detectDevices()
     })
   },
@@ -198,7 +196,12 @@ export default {
     },
     showMenu() {
       new Promise(async resolve => {
-        if (this.isMenuActive || this.isPointersLockActive) return false
+        if (
+          this.$refs.scene.slider.moving ||
+          this.isMenuActive ||
+          this.isPointersLockActive
+        )
+          return false
 
         this.isMenuActive = true
         await this.$refs.scene.slider.showMenu()
@@ -207,7 +210,12 @@ export default {
     },
     hideMenu() {
       new Promise(async resolve => {
-        if (!this.isMenuActive || this.isPointersLockActive) return false
+        if (
+          this.$refs.scene.slider.moving ||
+          !this.isMenuActive ||
+          this.isPointersLockActive
+        )
+          return false
 
         const menuBtn = document.querySelector('button.circles')
         menuBtn.blur()
@@ -225,7 +233,7 @@ export default {
       }
     },
     onShowreelBtnClick() {
-      if (this.isMenuActive || this.isPointersLockActive) return false
+      if (this.isPointersLockActive) return false
 
       this.isShowreelActive = true
     },
@@ -273,6 +281,9 @@ body
 
 body:not(.scrollable)
   overflow: hidden
+
+body.scrollable
+  overflow-x: hidden
 </style>
 
 <style lang="sass" scoped>

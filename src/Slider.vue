@@ -66,8 +66,6 @@ export default {
         initialSlug: this.$route.params.id
       })
 
-      window.slider = this
-
       this.initEvents(container)
     },
     initEvents(container) {

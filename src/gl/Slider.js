@@ -549,7 +549,10 @@ export default class Slider {
     this.arrB[3].material.uniforms.dispersionBlendMultiplier.value = 4 //face sphere
     this.arrB[2].material.uniforms.dispersionBlendMultiplier.value = 1.5
     this.arrB[4].material.uniforms.dispersionBlendMultiplier.value = 1.5
+
     this.adapt()
+    this.onWindowResize()
+
     if (this.adaptMode) {
       for (let i = 0; i < this.arrB.length; i++) {
         if (i != this.index) {

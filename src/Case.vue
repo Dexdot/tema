@@ -16,7 +16,9 @@
           <h2>About {{ content.title }}</h2>
           <p>{{ content.subtitle }}</p>
           <p class="case__date">{{ content.date }}</p>
-          <a class="case__url" :href="content.url">Visit site</a>
+          <a class="case__url" :href="content.url" target="_blank"
+            >Visit site</a
+          >
         </div>
         <div
           :class="[
@@ -80,6 +82,7 @@ export default {
   async created() {
     this.content = await getCase(this, this.$route.params.id)
     this.createObserver()
+
     this.$nextTick(() => {
       this.handleScroll()
 
@@ -94,6 +97,7 @@ export default {
   },
   methods: {
     handleScroll() {
+      window.scrollTo(0, 0)
       window.addEventListener('scroll', this.onScroll.bind(this))
     },
     onScroll() {
