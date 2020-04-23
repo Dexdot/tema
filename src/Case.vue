@@ -16,7 +16,11 @@
           <h2>About {{ content.title }}</h2>
           <p>{{ content.subtitle }}</p>
           <p class="case__date">{{ content.date }}</p>
-          <a class="case__url" :href="content.url" target="_blank"
+          <a
+            v-if="content.url"
+            class="case__url"
+            :href="content.url"
+            target="_blank"
             >Visit site</a
           >
         </div>
