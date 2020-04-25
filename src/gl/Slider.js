@@ -240,7 +240,7 @@ export default class Slider {
       uWiggleSpeed: 0.125,
       refractionRatio: 0.93,
       dispersionSamples: 30,
-      dispersionBlendMultiplier: 3,
+      dispersionBlendMultiplier: 6,
       dispersion: 0.8,
       mRefractionRatio: 1.0,
       mFresnelBias: 1,
@@ -319,7 +319,7 @@ export default class Slider {
           uWiggleSpeed: { type: 'f', value: 0.125 },
           refractionRatio: { type: 'f', value: 0.93 },
           dispersion: { type: 'f', value: 0.8 },
-          dispersionBlendMultiplier: { type: 'f', value: 3.0 },
+          dispersionBlendMultiplier: { type: 'f', value: 6.0 },
           cameraPosition: { value: this.camera.position },
           tCube: {
             type: 't',
